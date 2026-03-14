@@ -10,6 +10,10 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
+    # First Superuser
+    FIRST_SUPERUSER: str = "admin@example.com"
+    FIRST_SUPERUSER_PASSWORD: str = "adminpassword123"
+    
     # Database
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = "changeme"
