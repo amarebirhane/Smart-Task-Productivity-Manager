@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { authService } from "@/features/auth/authService";
 import AuthenticatedLayout from "@/components/AuthenticatedLayout";
-import { Lock, Loader2, KeyRound } from "lucide-react";
+import { Lock, Loader2, KeyRound, Eye, EyeOff } from "lucide-react";
 
 export default function ChangePasswordPage() {
   const [formData, setFormData] = useState({
@@ -12,6 +12,9 @@ export default function ChangePasswordPage() {
     confirm_password: "",
   });
   const [loading, setLoading] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,13 +73,20 @@ export default function ChangePasswordPage() {
                 <div className="relative">
                   <KeyRound className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
                   <input
-                    type="password"
-                    className="input-base pl-10"
+                    type={showOldPassword ? "text" : "password"}
+                    className="input-base pl-10 pr-10"
                     placeholder="Enter current password"
                     value={formData.old_password}
                     onChange={(e) => setFormData({ ...formData, old_password: e.target.value })}
                     required
                   />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 focus:outline-none"
+                    onClick={() => setShowOldPassword(!showOldPassword)}
+                  >
+                    {showOldPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
               </div>
 
@@ -85,13 +95,20 @@ export default function ChangePasswordPage() {
                 <div className="relative">
                   <Lock className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
                   <input
-                    type="password"
-                    className="input-base pl-10"
+                    type={showNewPassword ? "text" : "password"}
+                    className="input-base pl-10 pr-10"
                     placeholder="Enter new password"
                     value={formData.new_password}
                     onChange={(e) => setFormData({ ...formData, new_password: e.target.value })}
                     required
                   />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 focus:outline-none"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                  >
+                    {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
               </div>
 
@@ -100,13 +117,20 @@ export default function ChangePasswordPage() {
                 <div className="relative">
                   <Lock className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
                   <input
-                    type="password"
-                    className="input-base pl-10"
+                    type={showConfirmPassword ? "text" : "password"}
+                    className="input-base pl-10 pr-10"
                     placeholder="Confirm new password"
                     value={formData.confirm_password}
                     onChange={(e) => setFormData({ ...formData, confirm_password: e.target.value })}
                     required
                   />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 focus:outline-none"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
               </div>
             </div>

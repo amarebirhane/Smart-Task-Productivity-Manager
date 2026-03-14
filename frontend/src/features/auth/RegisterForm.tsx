@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { authService } from "@/features/auth/authService";
 import Link from "next/link";
-import { User as UserIcon, Mail, Lock, Loader2, ShieldCheck } from "lucide-react";
+import { User as UserIcon, Mail, Lock, Loader2, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
@@ -14,6 +14,7 @@ export default function RegisterForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
 
@@ -101,13 +102,20 @@ export default function RegisterForm() {
           <div className="relative">
             <Lock className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               required
-              className="input-base pl-10"
+              className="input-base pl-10 pr-10"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            <button
+              type="button"
+              className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 focus:outline-none"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
         </div>
 

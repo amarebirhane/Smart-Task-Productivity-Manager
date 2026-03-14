@@ -4,13 +4,14 @@ import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { authService } from "@/features/auth/authService";
 import Link from "next/link";
-import { Mail, Lock, Loader2 } from "lucide-react";
+import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
 
 export default function LoginForm() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -59,13 +60,20 @@ export default function LoginForm() {
           <div className="relative">
             <Lock className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               required
-              className="input-base pl-10"
+              className="input-base pl-10 pr-10"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            <button
+              type="button"
+              className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 focus:outline-none"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
         </div>
         

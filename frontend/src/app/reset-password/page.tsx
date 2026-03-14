@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { authService } from "@/features/auth/authService";
 import Link from "next/link";
-import { Lock, Loader2, Key, ArrowLeft } from "lucide-react";
+import { Lock, Loader2, Key, ArrowLeft, Eye, EyeOff } from "lucide-react";
 
 export default function ResetPasswordPage() {
   const [formData, setFormData] = useState({
@@ -12,6 +12,8 @@ export default function ResetPasswordPage() {
     confirm_password: "",
   });
   const [loading, setLoading] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,25 +84,39 @@ export default function ResetPasswordPage() {
             <div className="relative">
               <Lock className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
               <input
-                type="password"
+                type={showNewPassword ? "text" : "password"}
                 required
-                className="input-base pl-10"
+                className="input-base pl-10 pr-10"
                 placeholder="New Password"
                 value={formData.new_password}
                 onChange={(e) => setFormData({ ...formData, new_password: e.target.value })}
               />
+              <button
+                type="button"
+                className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 focus:outline-none"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+              >
+                {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
 
             <div className="relative">
               <Lock className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
               <input
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 required
-                className="input-base pl-10"
+                className="input-base pl-10 pr-10"
                 placeholder="Confirm New Password"
                 value={formData.confirm_password}
                 onChange={(e) => setFormData({ ...formData, confirm_password: e.target.value })}
               />
+              <button
+                type="button"
+                className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 focus:outline-none"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
