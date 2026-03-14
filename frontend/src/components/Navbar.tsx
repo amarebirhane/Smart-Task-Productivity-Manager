@@ -41,8 +41,21 @@ export default function Navbar() {
               
               {showDropdown && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-xl py-1 animate-fade-in z-50">
-                  <button
-                    onClick={logout}
+                  <Link
+                  href="/profile"
+                  className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors"
+                >
+                  My Profile
+                </Link>
+                <Link
+                  href="/settings/password"
+                  className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors"
+                >
+                  Security Settings
+                </Link>
+                <hr className="my-1 border-slate-100" />
+                <button
+                  onClick={logout}
                     className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                   >
                     <LogOut className="h-4 w-4 mr-2" />
