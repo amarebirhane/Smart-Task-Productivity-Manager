@@ -16,11 +16,11 @@ import {
 import { clsx } from "clsx";
 
 const navItems = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["user", "manager", "admin"] },
-  { name: "My Tasks", href: "/tasks", icon: CheckSquare, roles: ["user", "manager", "admin"] },
-  { name: "Team Management", href: "/dashboard/team", icon: Users, roles: ["manager", "admin"] },
-  { name: "System Analytics", href: "/dashboard/admin", icon: PieChart, roles: ["admin"] },
-  { name: "Users", href: "/users", icon: Users, roles: ["admin"] },
+  { name: "Overview", href: "/dashboard", icon: LayoutDashboard, roles: ["user", "manager", "admin"] },
+  { name: "My Tasks", href: "/dashboard/my-tasks", icon: CheckSquare, roles: ["user", "manager", "admin"] },
+  { name: "Team Analytics", href: "/dashboard/team", icon: TrendingUp, roles: ["manager", "admin"] },
+  { name: "System Health", href: "/dashboard/admin", icon: PieChart, roles: ["admin"] },
+  { name: "Platform Users", href: "/users", icon: Users, roles: ["admin"] },
 ];
 
 export default function Sidebar() {
