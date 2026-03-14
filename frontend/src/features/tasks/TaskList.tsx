@@ -6,6 +6,7 @@ import { taskService } from "@/features/tasks/taskService";
 import TaskCard from "@/components/TaskCard";
 import TaskForm from "@/components/TaskForm";
 import { Plus, Search, Filter, Loader2 } from "lucide-react";
+import { useTasks } from "@/hooks/useTasks";
 
 export default function TaskList() {
   const { tasks, loading, refreshTasks, deleteTask: apiDeleteTask, updateTask: apiUpdateTask } = useTasks();
@@ -104,7 +105,7 @@ export default function TaskList() {
       {isFormOpen && (
         <TaskForm 
           task={editingTask}
-          onSave={() => { setIsFormOpen(false); fetchTasks(); }}
+          onSave={() => { setIsFormOpen(false); refreshTasks(); }}
           onCancel={() => setIsFormOpen(false)}
         />
       )}
