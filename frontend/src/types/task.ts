@@ -19,3 +19,6 @@ export interface Task {
   created_at: string;
   category?: Category;
 }
+
+export type TaskCreate = Omit<Task, "id" | "created_at" | "category" | "user_id">;
+export type TaskUpdate = Partial<TaskCreate>;
