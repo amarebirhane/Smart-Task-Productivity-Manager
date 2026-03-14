@@ -25,6 +25,11 @@ def get_db() -> Generator:
 def get_current_user(
     db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
 ) -> User:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
     try:
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
@@ -33,10 +38,7 @@ def get_current_user(
         if user_id is None:
             raise credentials_exception
     except (JWTError, ValidationError):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Could not validate credentials",
-        )
+        raise credentials_exception
     user = get_user(db, user_id=user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -45,8 +47,9 @@ def get_current_user(
 def get_current_active_user(
     current_user: User = Depends(get_current_user),
 ) -> User:
-    # Adding as an example of common active-user check flow
+    # In a real app, you might check for an is_active flag here
     return current_user
+
 
 def get_current_active_admin_user(
     current_user: User = Depends(get_current_active_user),

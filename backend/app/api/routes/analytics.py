@@ -41,7 +41,8 @@ def get_user_analytics(
 @router.get("/system", response_model=SystemAnalytics)
 def get_system_analytics(
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_admin),
+    current_user: User = Depends(deps.get_current_active_admin_user),
+
 ) -> Any:
     """
     Get system-wide analytics (Admin only).
