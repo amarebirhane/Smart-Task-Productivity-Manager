@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import auth, users, tasks, categories
+from app.api.routes import auth, users, tasks, categories, analytics
 from app.core.config import settings
 from app.db.database import engine
 from app.db.base import Base
@@ -27,6 +27,7 @@ app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["aut
 app.include_router(users.router, prefix=f"{settings.API_V1_STR}/users", tags=["users"])
 app.include_router(tasks.router, prefix=f"{settings.API_V1_STR}/tasks", tags=["tasks"])
 app.include_router(categories.router, prefix=f"{settings.API_V1_STR}/categories", tags=["categories"])
+app.include_router(analytics.router, prefix=f"{settings.API_V1_STR}/analytics", tags=["analytics"])
 
 @app.get("/")
 def root():
