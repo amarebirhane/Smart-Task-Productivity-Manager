@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Task } from "@/types/task";
+import Link from "next/link";
 import { 
   Calendar, 
   Flag, 
@@ -76,9 +77,11 @@ export default function TaskCard({ task, onDelete, onEdit, onStatusChange }: Tas
           </div>
         </div>
 
-        <h3 className="text-lg font-bold text-slate-800 mb-1 group-hover:text-primary-600 transition-colors">
-          {task.title}
-        </h3>
+        <Link href={`/tasks/${task.id}`}>
+          <h3 className="text-lg font-bold text-slate-800 mb-1 group-hover:text-primary-600 transition-colors cursor-pointer hover:underline">
+            {task.title}
+          </h3>
+        </Link>
         <p className="text-sm text-slate-500 line-clamp-2 mb-4">
           {task.description || "No description provided."}
         </p>
