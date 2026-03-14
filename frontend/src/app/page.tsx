@@ -92,7 +92,7 @@ export default function Home() {
           <div className="relative animate-slide-up delay-200 hidden lg:block">
             <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl shadow-slate-300 border border-slate-100 scale-105 hover:scale-110 transition-transform duration-700">
               <img 
-                src="C:\Users\ASHROCK\.gemini\antigravity\brain\f921d1f5-b4da-439f-8540-e610d46adac8\productivity_hero_mockup_1773512726306.png" 
+                src="/images/productivity_hero_mockup_1773512726306.png" 
                 alt="Productivity Dashboard Mockup" 
                 className="w-full h-auto"
               />
@@ -173,7 +173,7 @@ export default function Home() {
           <div className="relative">
              <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary-100 rounded-full blur-3xl opacity-60"></div>
              <img 
-               src="C:\Users\ASHROCK\.gemini\antigravity\brain\f921d1f5-b4da-439f-8540-e610d46adac8\analytics_feature_mockup_1773512809180.png" 
+               src="/images/analytics_feature_mockup_1773512809180.png" 
                alt="Analytics Dashboard" 
                className="relative z-10 rounded-2xl shadow-xl border border-slate-100"
              />
@@ -223,7 +223,7 @@ export default function Home() {
           <div className="relative order-1 lg:order-2">
              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary-100 rounded-full blur-3xl opacity-60"></div>
              <img 
-               src="C:\Users\ASHROCK\.gemini\antigravity\brain\f921d1f5-b4da-439f-8540-e610d46adac8\collaboration_feature_mockup_1773512826452.png" 
+               src="/images/collaboration_feature_mockup_1773512826452.png" 
                alt="Team Collaboration" 
                className="relative z-10 rounded-2xl shadow-xl border border-slate-100"
              />
