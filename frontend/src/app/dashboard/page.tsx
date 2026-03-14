@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import api from "@/services/api";
+import Link from "next/link";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   PieChart, Pie, Cell, Legend 
@@ -16,11 +17,11 @@ import {
 } from "lucide-react";
 
 interface AnalyticsData {
-  total_tasks: int;
-  completed_tasks: int;
-  pending_tasks: int;
-  tasks_by_priority: Record<string, int>;
-  tasks_by_status: { status: string; count: int }[];
+  total_tasks: number;
+  completed_tasks: number;
+  pending_tasks: number;
+  tasks_by_priority: Record<string, number>;
+  tasks_by_status: { status: string; count: number }[];
 }
 
 const COLORS = ["#0ea5e9", "#f59e0b", "#ef4444", "#10b981"];
