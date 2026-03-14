@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { User } from "@/types/user";
-import api from "@/services/api";
+import { authService } from "@/features/auth/authService";
 import { useRouter } from "next/navigation";
 
 interface AuthContextType {
@@ -21,14 +21,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchUser = async () => {
     try {
-      // In a real app, you'd have a /users/me endpoint
-      // For now, we'll fetch from /users/ (admin restricted) or similar
-      // Or we can decode the JWT if we store user info there.
-      // Let's assume there is a /users/me or we fetch the first user as placeholder
-      const response = await api.get("/users/me");
-      setUser(response.data);
+      const data = await authService.getMe();
+      setUser(data);
     } catch (error) {
-      localStorage.removeItem("token");
+      authService.logout();
       setUser(null);
     } finally {
       setLoading(false);
@@ -36,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = authService.getToken();
     if (token) {
       fetchUser();
     } else {
@@ -45,13 +41,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (token: string) => {
-    localStorage.setItem("token", token);
+    authService.setToken(token);
     await fetchUser();
     router.push("/dashboard");
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    authService.logout();
     setUser(null);
     router.push("/login");
   };
