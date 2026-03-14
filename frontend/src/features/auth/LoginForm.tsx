@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import api from "@/services/api";
+import { authService } from "@/features/auth/authService";
 import Link from "next/link";
 import { Mail, Lock, Loader2 } from "lucide-react";
 
@@ -23,13 +23,8 @@ export default function LoginForm() {
       formData.append("username", email);
       formData.append("password", password);
 
-      const response = await api.post("/auth/login", formData, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      });
-
-      await login(response.data.access_token);
+      const data = await authService.login(formData);
+      await login(data.access_token);
     } catch (err: any) {
       setError(err.response?.data?.detail || "Login failed. Please check your credentials.");
     } finally {
