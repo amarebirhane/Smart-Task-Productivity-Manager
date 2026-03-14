@@ -2,12 +2,12 @@ import api from "@/services/api";
 import { AuthResponse, User } from "@/types/user";
 
 export const authService = {
-  login: async (formData: FormData): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>("/auth/login", formData, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
+  login: async (credentials: any): Promise<AuthResponse> => {
+    const params = new URLSearchParams();
+    params.append("username", credentials.username);
+    params.append("password", credentials.password);
+
+    const response = await api.post<AuthResponse>("/auth/login", params);
     return response.data;
   },
 

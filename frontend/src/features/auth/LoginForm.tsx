@@ -20,11 +20,10 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("username", identifier);
-      formData.append("password", password);
-
-      const data = await authService.login(formData);
+      const data = await authService.login({
+        username: identifier,
+        password: password,
+      });
       await login(data.access_token);
     } catch (err: any) {
       setError(err.response?.data?.detail || "Login failed. Please check your credentials.");
