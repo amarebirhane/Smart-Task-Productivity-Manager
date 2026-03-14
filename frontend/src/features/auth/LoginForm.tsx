@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Mail, Lock, Loader2 } from "lucide-react";
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ export default function LoginForm() {
 
     try {
       const formData = new FormData();
-      formData.append("username", email);
+      formData.append("username", identifier);
       formData.append("password", password);
 
       const data = await authService.login(formData);
@@ -48,12 +48,12 @@ export default function LoginForm() {
           <div className="relative">
             <Mail className="absolute left-3 top-2.5 h-5 w-5 text-slate-400" />
             <input
-              type="email"
+              type="text"
               required
               className="input-base pl-10"
-              placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email or Username"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
             />
           </div>
           <div className="relative">
@@ -67,6 +67,12 @@ export default function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+        </div>
+        
+        <div className="flex items-center justify-end">
+          <Link href="/forgot-password" size="sm" className="text-sm font-medium text-primary-600 hover:text-primary-500">
+            Forgot password?
+          </Link>
         </div>
 
         <div>
