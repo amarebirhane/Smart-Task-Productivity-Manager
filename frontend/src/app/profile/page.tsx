@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { authService } from "@/features/auth/authService";
 import AuthenticatedLayout from "@/components/AuthenticatedLayout";
+import { getErrorMessage } from "@/utils/errorHandler";
 import { User, UserCheck, Mail, Loader2, Save } from "lucide-react";
 
 export default function ProfilePage() {
@@ -40,7 +41,7 @@ export default function ProfilePage() {
     } catch (err: any) {
       setMessage({ 
         type: "error", 
-        text: err.response?.data?.detail || "Failed to update profile." 
+        text: getErrorMessage(err, "Failed to update profile.") 
       });
     } finally {
       setLoading(false);

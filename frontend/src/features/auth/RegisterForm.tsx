@@ -5,6 +5,7 @@ import { authService } from "@/features/auth/authService";
 import Link from "next/link";
 import { User as UserIcon, Mail, Lock, Loader2, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getErrorMessage } from "@/utils/errorHandler";
 
 export default function RegisterForm() {
   const [firstName, setFirstName] = useState("");
@@ -34,7 +35,7 @@ export default function RegisterForm() {
 
       router.push("/login?registered=true");
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Registration failed. Please try again.");
+      setError(getErrorMessage(err, "Registration failed. Please try again."));
     } finally {
       setLoading(false);
     }
