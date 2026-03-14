@@ -52,7 +52,7 @@ export default function ForgotPasswordPage() {
               {message.text}
               {message.type === "success" && (
                 <div className="mt-2">
-                   <Link href="/reset-password" class="font-bold underline">Go to Reset Page</Link>
+                   <Link href="/reset-password" className="font-bold underline">Go to Reset Page</Link>
                 </div>
               )}
             </div>

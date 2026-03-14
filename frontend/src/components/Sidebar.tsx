@@ -12,9 +12,8 @@ import {
   Settings,
   Menu,
   X,
-  TrendingUp
   TrendingUp,
-  User // Added User icon
+  User
 } from "lucide-react";
 import { clsx } from "clsx";
 
