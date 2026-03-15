@@ -6,6 +6,9 @@ from app.api.exception_handlers import (
     http_exception_handler,
     validation_exception_handler,
 )
+from app.core.dependencies import limiter
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
 
 from app.core.config import settings
 
@@ -32,6 +35,8 @@ app.add_middleware(
 app.add_exception_handler(Exception, global_exception_handler)
 app.add_exception_handler(HTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Import routes after middleware is set up
 from app.api.routes import auth, users, tasks, categories, analytics, settings as settings_routes, audit_logs, notifications  # noqa: E402

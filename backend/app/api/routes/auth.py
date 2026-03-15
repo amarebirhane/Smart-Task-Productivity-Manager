@@ -1,5 +1,5 @@
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -7,11 +7,14 @@ from app.api import deps
 from app.services.auth_service import auth_service
 from app.services.audit_service import audit_service
 from app.schemas.user_schema import UserCreate, UserResponse, PasswordResetRequest, PasswordReset
+from app.core.dependencies import limiter
 
 router = APIRouter()
 
 @router.post("/register", response_model=UserResponse)
+@limiter.limit("5/minute")
 def register(
+    request: Request,
     *,
     db: Session = Depends(deps.get_db),
     user_in: UserCreate,
@@ -22,7 +25,9 @@ def register(
     return auth_service.register_new_user(db, user_in)
 
 @router.post("/login")
+@limiter.limit("5/minute")
 def login(
+    request: Request,
     db: Session = Depends(deps.get_db),
     form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
