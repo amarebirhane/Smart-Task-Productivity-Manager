@@ -9,6 +9,7 @@ export interface User {
   role: UserRole;
   is_active: boolean;
   is_two_factor_enabled: boolean;
+  profile_image_url?: string;
   created_at: string;
 }
 
