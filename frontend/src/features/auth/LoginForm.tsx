@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { authService } from "@/features/auth/authService";
 import { getErrorMessage } from "@/utils/errorHandler";
+import { useToasts } from "@/components/Toast";
 import Link from "next/link";
 import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
 
@@ -14,6 +15,7 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
+  const { addToast } = useToasts();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +28,7 @@ export default function LoginForm() {
         password: password,
       });
       await login(data.access_token);
+      addToast("Successfully logged in!", "success", "Welcome back");
     } catch (err: any) {
       setError(getErrorMessage(err, "Login failed. Please check your credentials."));
     } finally {

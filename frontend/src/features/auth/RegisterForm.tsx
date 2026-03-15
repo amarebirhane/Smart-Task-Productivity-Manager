@@ -6,6 +6,7 @@ import Link from "next/link";
 import { User as UserIcon, Mail, Lock, Loader2, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { getErrorMessage } from "@/utils/errorHandler";
+import { useToasts } from "@/components/Toast";
 
 export default function RegisterForm() {
   const [firstName, setFirstName] = useState("");
@@ -16,6 +17,7 @@ export default function RegisterForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { addToast } = useToasts();
 
   const router = useRouter();
 
@@ -32,7 +34,8 @@ export default function RegisterForm() {
         email,
         password,
       });
-
+      
+      addToast("Account created successfully. Please log in.", "success", "Registration Complete");
       router.push("/login?registered=true");
     } catch (err: any) {
       setError(getErrorMessage(err, "Registration failed. Please try again."));
