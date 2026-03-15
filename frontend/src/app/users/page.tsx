@@ -5,13 +5,15 @@ import AuthenticatedLayout from "@/components/AuthenticatedLayout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { userService } from "@/services/userService";
 import { User } from "@/types/user";
-import { Trash2, UserCog, Mail, Shield, Loader2, Plus, X, User as UserIcon, Lock, Save } from "lucide-react";
+import { Trash2, UserCog, Mail, Shield, Loader2, Plus, X, User as UserIcon, Lock, Save, Eye, Power, AlertTriangle } from "lucide-react";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [userToView, setUserToView] = useState<User | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -37,10 +39,27 @@ export default function UsersPage() {
     fetchUsers();
   }, []);
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this user?")) {
-      await userService.deleteUser(id);
+  const handleDeleteConfirm = async () => {
+    if (userToDelete) {
+      setSubmitting(true);
+      try {
+        await userService.deleteUser(userToDelete.id);
+        setUserToDelete(null);
+        fetchUsers();
+      } catch (error) {
+        console.error("Failed to delete user", error);
+      } finally {
+        setSubmitting(false);
+      }
+    }
+  };
+
+  const handleToggleActive = async (targetUser: User) => {
+    try {
+      await userService.updateUser(targetUser.id, { is_active: !targetUser.is_active });
       fetchUsers();
+    } catch (error) {
+      console.error("Failed to update user status", error);
     }
   };
 
@@ -119,6 +138,7 @@ export default function UsersPage() {
                 <tr className="bg-slate-50 border-b border-slate-100">
                   <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">User</th>
                   <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Role</th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
                   <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Joined</th>
                   <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Actions</th>
                 </tr>
@@ -149,19 +169,46 @@ export default function UsersPage() {
                         {user.role}
                       </span>
                     </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        user.is_active ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"
+                      }`}>
+                        {user.is_active ? "Active" : "Inactive"}
+                      </span>
+                    </td>
                     <td className="px-6 py-4 text-sm text-slate-500">
                       {new Date(user.created_at).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-end gap-1">
                         <button 
+                          title="View Details"
+                          onClick={() => setUserToView(user)}
+                          className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-lg transition-all shadow-sm"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                        <button 
+                          title="Edit User"
                           onClick={() => openEditModal(user)}
                           className="p-2 text-slate-400 hover:text-primary-600 hover:bg-white rounded-lg transition-all shadow-sm"
                         >
                           <UserCog className="h-4 w-4" />
                         </button>
                         <button 
-                          onClick={() => handleDelete(user.id)}
+                          title={user.is_active ? "Deactivate User" : "Activate User"}
+                          onClick={() => handleToggleActive(user)}
+                          className={`p-2 rounded-lg transition-all shadow-sm ${
+                            user.is_active 
+                              ? "text-slate-400 hover:text-amber-600 hover:bg-white" 
+                              : "text-slate-400 hover:text-emerald-600 hover:bg-white"
+                          }`}
+                        >
+                          <Power className="h-4 w-4" />
+                        </button>
+                        <button 
+                          title="Delete User"
+                          onClick={() => setUserToDelete(user)}
                           className="p-2 text-slate-400 hover:text-red-600 hover:bg-white rounded-lg transition-all shadow-sm"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -289,6 +336,101 @@ export default function UsersPage() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* View Modal */}
+        {userToView && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-slide-up">
+              <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h3 className="font-bold text-slate-900 flex items-center gap-2">
+                  <UserIcon size={20} className="text-primary-600" />
+                  User Details
+                </h3>
+                <button onClick={() => setUserToView(null)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 text-xl font-bold">
+                    {userToView.first_name ? userToView.first_name.charAt(0) : userToView.username.charAt(0)}
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold text-slate-900">{userToView.first_name} {userToView.last_name}</h4>
+                    <p className="text-sm text-slate-500">@{userToView.username}</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
+                  <div>
+                    <span className="block text-xs font-bold text-slate-500 uppercase">Email</span>
+                    <span className="font-medium text-slate-900">{userToView.email}</span>
+                  </div>
+                  <div>
+                    <span className="block text-xs font-bold text-slate-500 uppercase">Role</span>
+                    <span className="font-medium text-slate-900 capitalize">{userToView.role}</span>
+                  </div>
+                  <div>
+                    <span className="block text-xs font-bold text-slate-500 uppercase">Status</span>
+                    <span className={`font-medium ${userToView.is_active ? 'text-emerald-600' : 'text-slate-500'}`}>
+                      {userToView.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="block text-xs font-bold text-slate-500 uppercase">2FA Status</span>
+                    <span className="font-medium text-slate-900">{userToView.is_two_factor_enabled ? 'Enabled' : 'Disabled'}</span>
+                  </div>
+                  <div className="col-span-2 border-t border-slate-100 pt-4">
+                    <span className="block text-xs font-bold text-slate-500 uppercase">Account Created</span>
+                    <span className="font-medium text-slate-900">{new Date(userToView.created_at).toLocaleString()}</span>
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <button 
+                    onClick={() => setUserToView(null)}
+                    className="w-full px-4 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all text-sm"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {userToDelete && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-slide-up">
+              <div className="p-6 text-center space-y-4">
+                <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <AlertTriangle size={32} />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900">Delete User?</h3>
+                <p className="text-sm text-slate-500">
+                  Are you sure you want to delete <span className="font-bold text-slate-900">{userToDelete.username}</span>? This action cannot be undone.
+                </p>
+                <div className="pt-4 flex gap-3">
+                  <button 
+                    onClick={() => setUserToDelete(null)}
+                    disabled={submitting}
+                    className="flex-1 px-4 py-2 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all text-sm disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleDeleteConfirm}
+                    disabled={submitting}
+                    className="flex-1 px-4 py-2 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-200 text-sm flex justify-center items-center disabled:opacity-50"
+                  >
+                    {submitting ? <Loader2 size={18} className="animate-spin" /> : "Delete"}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}

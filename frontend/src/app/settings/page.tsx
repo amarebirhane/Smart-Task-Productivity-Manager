@@ -14,7 +14,9 @@ import {
   Save, 
   Loader2, 
   AlertCircle,
-  X
+  X,
+  Lock,
+  CheckCircle2
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -206,17 +208,30 @@ export default function SettingsPage() {
                     <p className="text-sm text-slate-500">Manage your password and security settings</p>
                   </div>
                   <div className="space-y-6">
-                    <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200 flex justify-between items-center">
-                      <div>
-                        <h4 className="font-bold text-slate-900">Password</h4>
-                        <p className="text-xs text-slate-500">Update your account password</p>
+                    <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 bg-primary-100 rounded-xl flex items-center justify-center text-primary-600">
+                            <Lock size={20} />
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-slate-800">Account Password</p>
+                            <p className="text-xs text-slate-500">Update your account password</p>
+                          </div>
+                        </div>
                       </div>
-                      <button 
-                        onClick={() => setShowPasswordEdit(true)}
-                        className="btn-primary-outline px-4 py-2 text-sm"
-                      >
-                        Change Password
-                      </button>
+                      <div className="space-y-4">
+                        <button 
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setShowPasswordEdit(true);
+                          }}
+                          className="px-6 py-2 bg-primary-600 text-white rounded-xl text-sm font-bold hover:bg-primary-700 transition-all shadow-lg shadow-primary-100"
+                        >
+                          Change Password
+                        </button>
+                      </div>
                     </div>
                     <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200">
                       <div className="flex items-start justify-between mb-4">
@@ -351,8 +366,9 @@ export default function SettingsPage() {
 
         {/* Change Password Modal */}
         {showPasswordEdit && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-slide-up">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-fade-in">
+            <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm cursor-pointer" onClick={() => setShowPasswordEdit(false)}></div>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-slide-up relative z-10">
               <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                 <h3 className="font-bold text-slate-900">Change Password</h3>
                 <button onClick={() => setShowPasswordEdit(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
