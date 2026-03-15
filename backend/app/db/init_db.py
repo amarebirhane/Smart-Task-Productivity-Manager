@@ -31,3 +31,19 @@ def init_db(db: Session) -> None:
         )
         update_user(db, db_user=admin, user_in=update_data)
         print(f"Default admin credentials synchronized for: {settings.FIRST_SUPERUSER_USERNAME}")
+
+    # Seed initial settings if they don't exist
+    from app.crud.setting_crud import get_setting, create_setting
+    from app.schemas.setting_schema import SettingCreate
+    
+    initial_settings = [
+        {"key": "site_name", "value": "TaskMind", "description": "The name of the platform", "is_public": True},
+        {"key": "registration_enabled", "value": "true", "description": "Allow new users to register", "is_public": True},
+        {"key": "default_user_role", "value": "user", "description": "Default role for new users", "is_public": False},
+        {"key": "maintenance_mode", "value": "false", "description": "Enable maintenance mode", "is_public": True},
+    ]
+    
+    for s in initial_settings:
+        if not get_setting(db, key=s["key"]):
+            create_setting(db, SettingCreate(**s))
+            print(f"Seeded setting: {s['key']}={s['value']}")
