@@ -5,6 +5,7 @@ import AuthenticatedLayout from "@/components/AuthenticatedLayout";
 import { useAuth } from "@/context/AuthContext";
 import api from "@/services/api";
 import { authService } from "@/features/auth/authService";
+import { useToasts } from "@/components/Toast";
 import { 
   Settings as SettingsIcon, 
   Shield, 
@@ -33,7 +34,7 @@ export default function SettingsPage() {
   const [settings, setSettings] = useState<Setting[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState({ type: "", text: "" });
+  const { addToast } = useToasts();
   
   // 2FA States
   const [show2FASetup, setShow2FASetup] = useState(false);
@@ -68,11 +69,10 @@ export default function SettingsPage() {
     
     try {
       await api.put(`/settings/${key}`, { value });
-      setMessage({ type: "success", text: "Settings saved successfully." });
-      setTimeout(() => setMessage({ type: "", text: "" }), 3000);
+      addToast("Settings saved successfully.", "success");
     } catch (error) {
       setSettings(originalSettings);
-      setMessage({ type: "error", text: "Failed to save settings." });
+      addToast("Failed to save settings.", "error");
     }
   };
 
@@ -84,7 +84,7 @@ export default function SettingsPage() {
       // Generate QR code from provisioning_uri
       setQrCode(data.provisioning_uri);
     } catch (error) {
-      setMessage({ type: "error", text: "Failed to initialize 2FA setup." });
+      addToast("Failed to initialize 2FA setup.", "error");
     }
   };
 
@@ -92,12 +92,12 @@ export default function SettingsPage() {
     setSaving(true);
     try {
       await authService.verify2FA(twoFactorCode);
-      setMessage({ type: "success", text: "Two-Factor Authentication enabled successfully!" });
+      addToast("Two-Factor Authentication enabled successfully!", "success");
       setShow2FASetup(false);
       // Reload user to update global state
       window.location.reload();
     } catch (error) {
-      setMessage({ type: "error", text: "Invalid code. Please try again." });
+      addToast("Invalid code. Please try again.", "error");
     } finally {
       setSaving(false);
     }
@@ -111,13 +111,13 @@ export default function SettingsPage() {
     setSaving(true);
     try {
       await authService.changePassword({ old_password: oldPassword, new_password: newPassword });
-      setMessage({ type: "success", text: "Password updated successfully." });
+      addToast("Password updated successfully.", "success");
       setShowPasswordEdit(false);
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (error: any) {
-      setMessage({ type: "error", text: error.response?.data?.detail || "Failed to update password." });
+      addToast(error.response?.data?.detail || "Failed to update password.", "error");
     } finally {
       setSaving(false);
     }
@@ -168,16 +168,6 @@ export default function SettingsPage() {
           {/* Tab Content */}
           <div className="flex-1">
             <div className="card-premium p-8 animate-fade-in">
-              {message.text && (
-                <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 text-sm ${
-                  message.type === "success" 
-                    ? "bg-emerald-50 text-emerald-700 border border-emerald-100" 
-                    : "bg-red-50 text-red-700 border border-red-100"
-                }`}>
-                  {message.type === "success" ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
-                  {message.text}
-                </div>
-              )}
 
               {activeTab === "general" && (
                 <div className="space-y-8">

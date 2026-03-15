@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { collaborationService } from '../services/collaborationService';
 import { userService } from '../services/userService';
+import { useToasts } from './Toast';
 import { TaskShare } from '../types/task';
 import { User } from '../types/user';
 
@@ -17,6 +18,7 @@ const ShareTaskModal: React.FC<ShareTaskModalProps> = ({ taskId, isOpen, onClose
   const [collaborators, setCollaborators] = useState<TaskShare[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { addToast } = useToasts();
 
   useEffect(() => {
     if (isOpen) {
@@ -54,8 +56,11 @@ const ShareTaskModal: React.FC<ShareTaskModalProps> = ({ taskId, isOpen, onClose
       setEmail('');
       fetchCollaborators();
       onShareSuccess?.();
+      addToast("Task shared successfully", "success");
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to share task');
+      const msg = err.response?.data?.detail || 'Failed to share task';
+      setError(msg);
+      addToast(msg, "error");
     } finally {
       setLoading(false);
     }
@@ -66,8 +71,9 @@ const ShareTaskModal: React.FC<ShareTaskModalProps> = ({ taskId, isOpen, onClose
     try {
       await collaborationService.unshareTask(shareId);
       fetchCollaborators();
+      addToast("Collaborator removed", "info");
     } catch (err) {
-      alert('Failed to remove collaborator');
+      addToast('Failed to remove collaborator', "error");
     }
   };
 

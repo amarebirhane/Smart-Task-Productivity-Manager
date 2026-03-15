@@ -5,6 +5,7 @@ import AuthenticatedLayout from "@/components/AuthenticatedLayout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { userService } from "@/services/userService";
 import { User } from "@/types/user";
+import { useToasts } from "@/components/Toast";
 import { Trash2, UserCog, Mail, Shield, Loader2, Plus, X, User as UserIcon, Lock, Save, Eye, Power, AlertTriangle } from "lucide-react";
 
 export default function UsersPage() {
@@ -15,6 +16,7 @@ export default function UsersPage() {
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [userToView, setUserToView] = useState<User | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const { addToast } = useToasts();
   const [formData, setFormData] = useState({
     email: "",
     username: "",
@@ -46,8 +48,10 @@ export default function UsersPage() {
         await userService.deleteUser(userToDelete.id);
         setUserToDelete(null);
         fetchUsers();
+        addToast("User deleted successfully", "success");
       } catch (error) {
         console.error("Failed to delete user", error);
+        addToast("Failed to delete user", "error");
       } finally {
         setSubmitting(false);
       }
@@ -58,8 +62,10 @@ export default function UsersPage() {
     try {
       await userService.updateUser(targetUser.id, { is_active: !targetUser.is_active });
       fetchUsers();
+      addToast(`User ${targetUser.is_active ? "deactivated" : "activated"}`, "info");
     } catch (error) {
       console.error("Failed to update user status", error);
+      addToast("Failed to update user status", "error");
     }
   };
 
@@ -104,8 +110,10 @@ export default function UsersPage() {
       }
       setModalOpen(false);
       fetchUsers();
+      addToast(editingUser ? "User updated" : "User created", "success");
     } catch (error) {
       console.error("Failed to save user", error);
+      addToast("Error saving user", "error");
     } finally {
       setSubmitting(false);
     }

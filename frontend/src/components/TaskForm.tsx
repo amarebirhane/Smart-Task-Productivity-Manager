@@ -5,6 +5,7 @@ import { Task, Category } from "@/types/task";
 import { taskService } from "@/features/tasks/taskService";
 import { X, Save, AlertCircle } from "lucide-react";
 import { getErrorMessage } from "@/utils/errorHandler";
+import { useToasts } from "@/components/Toast";
 
 interface TaskFormProps {
   task?: Task | null;
@@ -22,6 +23,7 @@ export default function TaskForm({ task, onSave, onCancel }: TaskFormProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { addToast } = useToasts();
 
   useEffect(() => {
     taskService.getCategories().then(setCategories).catch(console.error);
@@ -47,9 +49,12 @@ export default function TaskForm({ task, onSave, onCancel }: TaskFormProps) {
       } else {
         await taskService.createTask(taskData);
       }
+      addToast(task ? "Task updated successfully" : "Task created successfully", "success");
       onSave();
     } catch (err: any) {
-      setError(getErrorMessage(err, "Failed to save task."));
+      const msg = getErrorMessage(err, "Failed to save task.");
+      setError(msg);
+      addToast(msg, "error");
     } finally {
       setLoading(false);
     }
