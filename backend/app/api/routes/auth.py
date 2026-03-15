@@ -28,7 +28,7 @@ def register(
     
     # Send welcome email in the background
     background_tasks.add_task(
-        email_service.send_simulated_email,
+        email_service.send_email,
         to_email=user.email,
         subject="Welcome to TaskMind!",
         body=f"Hi {user.first_name}, your account has been created successfully."
