@@ -1,18 +1,17 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from uuid import UUID
 from datetime import datetime
 from typing import Optional
-from pydantic import field_validator
 from app.utils.sanitization import sanitize_text
 from app.schemas.category_schema import CategoryResponse
 
 class TaskBase(BaseModel):
-    title: str
-    description: Optional[str] = None
-    priority: str
-    status: str = "pending"
-    deadline: Optional[datetime] = None
-    category_id: Optional[UUID] = None
+    title: str = Field(..., description="The main headline or title of the task")
+    description: Optional[str] = Field(None, description="A detailed explanation of the task objective")
+    priority: str = Field(..., description="Task urgency level (e.g., low, medium, high)")
+    status: str = Field("pending", description="Current execution state (e.g., pending, in_progress, completed)")
+    deadline: Optional[datetime] = Field(None, description="The target completion date and time")
+    category_id: Optional[UUID] = Field(None, description="The unique ID of the category this task belongs to")
 
     @field_validator('title', 'description', mode='before')
     @classmethod
