@@ -17,3 +17,4 @@ from app.models.category import Category  # noqa
 from app.models.setting import Setting  # noqa
 from app.models.audit_log import AuditLog  # noqa
 from app.models.notification import Notification  # noqa
+from app.models.task_share import TaskShare  # noqa
