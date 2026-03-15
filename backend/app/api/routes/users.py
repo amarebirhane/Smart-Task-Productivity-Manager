@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.api import deps
 from app.crud.user_crud import get_users, get_user, delete_user, update_user
 from app.schemas.user_schema import UserResponse, UserUpdateMe, PasswordChange, UserUpdate
+from app.schemas.pagination_schema import PaginatedResponse
 from app.services.auth_service import auth_service
 from app.models.user import User
 
@@ -47,7 +48,7 @@ def change_password_me(
     )
     return {"msg": "Password updated successfully"}
 
-@router.get("/", response_model=List[UserResponse])
+@router.get("/", response_model=PaginatedResponse[UserResponse])
 def read_users(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
@@ -57,8 +58,15 @@ def read_users(
     """
     Retrieve users. (Admin only)
     """
-    users = get_users(db, skip=skip, limit=limit)
-    return users
+    users, total = get_users(db, skip=skip, limit=limit)
+    import math
+    return {
+        "items": users,
+        "total": total,
+        "page": (skip // limit) + 1 if limit > 0 else 1,
+        "size": limit,
+        "pages": math.ceil(total / limit) if limit > 0 else 1
+    }
 
 @router.get("/{user_id}", response_model=UserResponse)
 def read_user_by_id(

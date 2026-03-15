@@ -16,7 +16,10 @@ def get_user_by_username(db: Session, username: str):
 
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(User).offset(skip).limit(limit).all()
+    query = db.query(User)
+    total = query.count()
+    users = query.offset(skip).limit(limit).all()
+    return users, total
 
 
 def create_user(db: Session, user: UserCreate, role: str = "user"):
