@@ -3,7 +3,8 @@
     "venv": "venv",
     "extraPaths": [
         "backend",
-        "backend/app"
+        "backend/app",
+        "backend/migrations"
     ],
     "typeCheckingMode": "basic"
 }
