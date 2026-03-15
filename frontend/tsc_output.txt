@@ -1,1 +1,0 @@
-src/app/admin/health/page.tsx(120,1): error TS2304: Cannot find name '捉'.
