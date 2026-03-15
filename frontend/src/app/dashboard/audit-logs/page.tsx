@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import api from "@/services/api";
+import { auditService, AuditLog } from "@/services/auditService";
+import Pagination from "@/components/Pagination";
 import { Loader2, Shield, User, Clock, Activity, Search, Filter } from "lucide-react";
 
 export default function AuditLogsPage() {
@@ -132,7 +133,15 @@ export default function AuditLogsPage() {
                 </tbody>
               </table>
             </div>
-            {filteredLogs.length === 0 && (
+            
+            <Pagination
+              currentPage={page}
+              totalPages={paginationInfo.pages}
+              onPageChange={handlePageChange}
+              pageSize={paginationInfo.size}
+              totalItems={paginationInfo.total}
+            />
+          {filteredLogs.length === 0 && (
               <div className="p-12 text-center">
                 <Activity size={48} className="mx-auto text-slate-300 mb-4" />
                 <p className="text-slate-500 font-medium">No audit logs found matching your search.</p>
