@@ -38,6 +38,16 @@ class Settings(BaseSettings):
     S3_ACCESS_KEY: Optional[str] = None
     S3_SECRET_KEY: Optional[str] = None
     
+    # Environment
+    ENVIRONMENT: str = "development" # development, production
+
+    @field_validator("SMTP_PASSWORD", "S3_SECRET_KEY", "SECRET_KEY", mode="after")
+    @classmethod
+    def check_secrets_in_production(cls, v: Optional[str], info: Any) -> Optional[str]:
+        if info.data.get("ENVIRONMENT") == "production" and not v:
+            raise ValueError(f"CRITICAL: {info.field_name} must be set in production environment!")
+        return v
+
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         # Use postgresql+psycopg2 for sync or postgresql+asyncpg for async
