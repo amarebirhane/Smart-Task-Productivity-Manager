@@ -23,6 +23,7 @@ export interface Attachment {
   file_type: string;
   file_size: number;
   uploaded_at: string;
+  url?: string;
 }
 
 export interface Task {
