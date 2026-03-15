@@ -8,6 +8,8 @@ from app.crud.user_crud import get_user_by_email, get_user_by_username, create_u
 from app.schemas.user_schema import UserCreate, UserUpdate
 from app.utils.token import create_access_token
 from app.utils.hash import verify_password
+from app.services.audit_service import audit_service
+import pyotp
 
 class AuthService:
     @staticmethod
@@ -18,7 +20,9 @@ class AuthService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="A user with this email already exists.",
             )
-        return create_user(db, user=user_in, role="user")
+        new_user = create_user(db, user=user_in, role="user")
+        audit_service.log(db, user_id=new_user.id, username=new_user.username, action="register", target_type="user", target_id=str(new_user.id))
+        return new_user
 
 
     @staticmethod
@@ -30,8 +34,28 @@ class AuthService:
             user = get_user_by_username(db, username=identifier)
             
         if not user or not verify_password(password, user.hashed_password):
+            audit_service.log(db, username=identifier, action="login_failed", details={"reason": "invalid_credentials"})
             return None
+        
+        if not user.is_active:
+            audit_service.log(db, user_id=user.id, username=user.username, action="login_denied", details={"reason": "account_inactive"})
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account is inactive")
+
         return user
+
+    @staticmethod
+    def verify_2fa(user, code: str):
+        if not user.two_factor_secret:
+            return False
+        totp = pyotp.TOTP(user.two_factor_secret)
+        return totp.verify(code)
+
+    @staticmethod
+    def setup_2fa(db: Session, user):
+        secret = pyotp.random_base32()
+        user.two_factor_secret = secret
+        db.commit()
+        return secret
 
     @staticmethod
     def change_password(db: Session, user, old_password: str, new_password: str):
