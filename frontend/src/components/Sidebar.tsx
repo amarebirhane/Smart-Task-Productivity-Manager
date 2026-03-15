@@ -14,7 +14,9 @@ import {
   X,
   TrendingUp,
   User,
-  Activity
+  Activity,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { clsx } from "clsx";
 
@@ -47,15 +49,19 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       isOpen ? "w-64 translate-x-0" : "w-20 -translate-x-full md:translate-x-0"
     )}>
       <div className="h-full px-3 py-4 overflow-y-auto">
-        <div className="flex items-center justify-between mb-10 px-2">
+        <div className="flex items-center justify-between mb-10 px-2 text-slate-900">
           <Link href="/dashboard" className="flex items-center">
             <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center mr-2">
               <CheckSquare className="text-white h-5 w-5" />
             </div>
             {isOpen && <span className="text-xl font-bold text-slate-900">TaskMind</span>}
           </Link>
-          <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-slate-500 hover:text-slate-900">
-            {isOpen ? <X /> : <Menu />}
+          <button 
+            onClick={() => setIsOpen(!isOpen)} 
+            className="p-1.5 rounded-lg bg-slate-50 text-slate-500 hover:text-primary-600 hover:bg-primary-50 transition-all border border-slate-200"
+            title={isOpen ? "Collapse Sidebar" : "Expand Sidebar"}
+          >
+            {isOpen ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
           </button>
         </div>
 
