@@ -25,6 +25,7 @@ const navItems = [
   { name: "Security", href: "/settings/password", icon: Settings, roles: ["user", "manager", "admin"] }, // Added Security link
   { name: "System Health", href: "/dashboard/admin", icon: PieChart, roles: ["admin"] },
   { name: "Platform Users", href: "/users", icon: Users, roles: ["admin"] },
+  { name: "Audit Logs", href: "/dashboard/audit-logs", icon: Activity, roles: ["admin"] },
 ];
 
 export default function Sidebar() {
