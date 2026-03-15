@@ -5,6 +5,9 @@ from app.models.task import Task
 from app.models.task_share import TaskShare
 from app.schemas.task_schema import TaskCreate, TaskUpdate
 
+def get_task(db: Session, task_id: str):
+    return db.query(Task).filter(Task.id == task_id).first()
+
 def get_tasks(db: Session, skip: int = 0, limit: int = 100, search: Optional[str] = None):
     query = db.query(Task)
     if search:
