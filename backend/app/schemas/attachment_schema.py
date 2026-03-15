@@ -15,6 +15,7 @@ class AttachmentCreate(AttachmentBase):
 class AttachmentResponse(AttachmentBase):
     id: UUID
     file_path: str
+    url: Optional[str] = None # Presigned URL for frontend access
     uploaded_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
