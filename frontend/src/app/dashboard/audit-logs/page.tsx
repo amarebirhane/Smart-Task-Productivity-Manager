@@ -5,27 +5,28 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import api from "@/services/api";
 import { Loader2, Shield, User, Clock, Activity, Search, Filter } from "lucide-react";
 
-interface AuditLog {
-  id: string;
-  user_id: string | null;
-  username: string | null;
-  action: string;
-  target_type: string | null;
-  target_id: string | null;
-  details: any;
-  ip_address: string | null;
-  created_at: string;
-}
-
 export default function AuditLogsPage() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [paginationInfo, setPaginationInfo] = useState({
+    total: 0,
+    pages: 0,
+    size: 8
+  });
   const [searchTerm, setSearchTerm] = useState("");
 
-  const fetchLogs = async () => {
+  const fetchLogs = async (targetPage = page) => {
+    setLoading(true);
     try {
-      const response = await api.get<AuditLog[]>("/audit-logs/");
-      setLogs(response.data);
+      const data = await auditService.getLogs(targetPage, 8);
+      setLogs(data.items);
+      setPaginationInfo({
+        total: data.total,
+        pages: data.pages,
+        size: data.size
+      });
+      setPage(data.page);
     } catch (error) {
       console.error("Failed to fetch audit logs", error);
     } finally {
@@ -34,8 +35,12 @@ export default function AuditLogsPage() {
   };
 
   useEffect(() => {
-    fetchLogs();
+    fetchLogs(1);
   }, []);
+
+  const handlePageChange = (newPage: number) => {
+    fetchLogs(newPage);
+  };
 
   const filteredLogs = logs.filter(log => 
     log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
