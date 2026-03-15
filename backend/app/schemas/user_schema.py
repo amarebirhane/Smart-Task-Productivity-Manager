@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, field_validator, Field
 from uuid import UUID
 from datetime import datetime
 from typing import Optional
@@ -6,10 +6,10 @@ from app.utils.sanitization import sanitize_text
 import re
 
 class UserBase(BaseModel):
-    email: EmailStr
-    username: str
-    first_name: str
-    last_name: str
+    email: EmailStr = Field(..., description="The unique email address of the user")
+    username: str = Field(..., description="The unique username pick by the user")
+    first_name: str = Field(..., description="The user's legal first name")
+    last_name: str = Field(..., description="The user's legal last name")
 
     @field_validator('username', 'first_name', 'last_name', mode='before')
     @classmethod
