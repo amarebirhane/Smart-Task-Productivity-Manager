@@ -117,4 +117,3 @@ function HealthCard({ name, status, loading }: { name: string; status: string; l
     </div>
   );
 }
-捉
