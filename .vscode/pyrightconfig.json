@@ -2,7 +2,8 @@
     "venvPath": "backend",
     "venv": "venv",
     "extraPaths": [
-        "backend"
+        "backend",
+        "backend/app"
     ],
     "typeCheckingMode": "basic"
 }
