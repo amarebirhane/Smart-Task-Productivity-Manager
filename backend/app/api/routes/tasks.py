@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Optional
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -14,12 +14,13 @@ def read_tasks(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
+    search: Optional[str] = None,
     current_user: User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve tasks.
     """
-    return task_service.get_tasks_for_user(db, user=current_user, skip=skip, limit=limit)
+    return task_service.get_tasks_for_user(db, user=current_user, skip=skip, limit=limit, search=search)
 
 @router.post("/", response_model=TaskResponse)
 def create_task(

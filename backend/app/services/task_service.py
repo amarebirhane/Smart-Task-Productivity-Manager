@@ -12,10 +12,10 @@ from app.schemas.category_schema import CategoryCreate, CategoryUpdate
 
 class TaskService:
     @staticmethod
-    def get_tasks_for_user(db: Session, user: User, skip: int = 0, limit: int = 100):
+    def get_tasks_for_user(db: Session, user: User, skip: int = 0, limit: int = 100, search: Optional[str] = None):
         if user.role in ["admin", "manager"]:
-            return task_crud.get_tasks(db, skip=skip, limit=limit)
-        return task_crud.get_user_tasks(db, user_id=str(user.id), skip=skip, limit=limit)
+            return task_crud.get_tasks(db, skip=skip, limit=limit, search=search)
+        return task_crud.get_user_tasks(db, user_id=str(user.id), skip=skip, limit=limit, search=search)
 
     @staticmethod
     def create_task(db: Session, user: User, task_in: TaskCreate):
