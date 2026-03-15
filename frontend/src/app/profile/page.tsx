@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { authService } from "@/features/auth/authService";
 import AuthenticatedLayout from "@/components/AuthenticatedLayout";
 import { getErrorMessage } from "@/utils/errorHandler";
+import { useToasts } from "@/components/Toast";
 import { User, UserCheck, Mail, Loader2, Save } from "lucide-react";
 
 export default function ProfilePage() {
@@ -16,7 +17,7 @@ export default function ProfilePage() {
     last_name: "",
   });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ type: "", text: "" });
+  const { addToast } = useToasts();
 
   useEffect(() => {
     if (user) {
@@ -32,17 +33,13 @@ export default function ProfilePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage({ type: "", text: "" });
 
     try {
       const updatedUser = await authService.updateProfile(formData);
       setUser(updatedUser);
-      setMessage({ type: "success", text: "Profile updated successfully!" });
+      addToast("Profile updated successfully!", "success");
     } catch (err: any) {
-      setMessage({ 
-        type: "error", 
-        text: getErrorMessage(err, "Failed to update profile.") 
-      });
+      addToast(getErrorMessage(err, "Failed to update profile."), "error");
     } finally {
       setLoading(false);
     }
@@ -63,13 +60,6 @@ export default function ProfilePage() {
 
         <div className="card-premium p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {message.text && (
-              <div className={`p-4 rounded-lg text-sm ${
-                message.type === "success" ? "bg-green-50 text-green-700 border border-green-100" : "bg-red-50 text-red-700 border border-red-100"
-              }`}>
-                {message.text}
-              </div>
-            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
