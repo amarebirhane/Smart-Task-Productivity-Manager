@@ -247,6 +247,14 @@ export default function UsersPage() {
                 ))}
               </tbody>
             </table>
+            
+            <Pagination
+              currentPage={page}
+              totalPages={paginationInfo.pages}
+              onPageChange={handlePageChange}
+              pageSize={paginationInfo.size}
+              totalItems={paginationInfo.total}
+            />
           </div>
         )}
 
