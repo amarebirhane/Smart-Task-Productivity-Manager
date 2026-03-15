@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { authService } from "@/features/auth/authService";
 import Link from "next/link";
 import { getErrorMessage } from "@/utils/errorHandler";
+import { useToasts } from "@/components/Toast";
 import { Mail, Loader2, ArrowLeft, Lock, Shield, KeyRound, CheckCircle2 } from "lucide-react";
 
 type Step = "email" | "2fa" | "new-password" | "done";
@@ -17,21 +18,22 @@ export default function ForgotPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [needs2FA, setNeeds2FA] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { addToast } = useToasts();
   const [error, setError] = useState("");
 
   // Step 1: Request reset token
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
     try {
       const res = await authService.requestPasswordReset(email);
       setResetToken(res.token);
       setNeeds2FA(res["2fa_required"] ?? false);
       // Skip 2FA step if not required
       setStep(res["2fa_required"] ? "2fa" : "new-password");
+      addToast("Reset token sent to your email", "info");
     } catch (err: any) {
-      setError(getErrorMessage(err, "Failed to request password reset."));
+      addToast(getErrorMessage(err, "Failed to request password reset."), "error");
     } finally {
       setLoading(false);
     }
@@ -42,30 +44,29 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     // Just move to next step — the code will be submitted later with the password
     if (twoFACode.length === 6) setStep("new-password");
-    else setError("Please enter a valid 6-digit code.");
+    else addToast("Please enter a valid 6-digit code.", "warning");
   };
 
   // Step 2b / 3: Set new password
   const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
     if (newPassword !== confirmPassword) {
-      setError("Passwords do not match.");
+      addToast("Passwords do not match.", "error");
       return;
     }
     if (newPassword.length < 8) {
-      setError("Password must be at least 8 characters.");
+      addToast("Password must be at least 8 characters.", "warning");
       return;
     }
     setLoading(true);
-    setError("");
     try {
       await authService.resetPassword(
         { token: resetToken, new_password: newPassword },
         needs2FA ? twoFACode : undefined
       );
       setStep("done");
+      addToast("Password updated successfully!", "success");
     } catch (err: any) {
-      setError(getErrorMessage(err, "Failed to reset password. Please start over."));
+      addToast(getErrorMessage(err, "Failed to reset password. Please start over."), "error");
     } finally {
       setLoading(false);
     }
