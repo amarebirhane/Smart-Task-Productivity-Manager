@@ -1,13 +1,18 @@
 {
-  "venvPath": ".",
-  "venv": "venv",
+  "venvPath": "..",
+  "venv": "backend/venv",
   "pythonVersion": "3.12",
+  "typeCheckingMode": "basic",
+  "reportMissingImports": true,
+  "useLibraryCodeForTypes": true,
   "include": [
+    ".",
     "app",
     "migrations"
   ],
   "extraPaths": [
     ".",
+    "app",
     "migrations"
   ]
 }

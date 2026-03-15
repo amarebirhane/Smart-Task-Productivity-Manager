@@ -4,6 +4,8 @@
         "${workspaceFolder}/backend",
         "${workspaceFolder}/backend/migrations"
     ],
+    "python.analysis.venvPath": "${workspaceFolder}/backend",
+    "python.analysis.venv": "venv",
     "python.terminal.activateEnvironment": true
 }
 
