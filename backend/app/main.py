@@ -9,6 +9,10 @@ from app.api.exception_handlers import (
 from app.core.dependencies import limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi import _rate_limit_exceeded_handler
+from app.core.logging_config import setup_logging
+
+# Initialize Logging
+setup_logging()
 
 from app.core.config import settings
 
