@@ -6,12 +6,20 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { userService } from "@/services/userService";
 import { User } from "@/types/user";
 import { useToasts } from "@/components/Toast";
+import Pagination from "@/components/Pagination";
 import { Trash2, UserCog, Mail, Shield, Loader2, Plus, X, User as UserIcon, Lock, Save, Eye, Power, AlertTriangle } from "lucide-react";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [paginationInfo, setPaginationInfo] = useState({
+    total: 0,
+    pages: 0,
+    size: 8
+  });
   const [modalOpen, setModalOpen] = useState(false);
+  // ... rest of state unchanged
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [userToView, setUserToView] = useState<User | null>(null);
@@ -26,20 +34,32 @@ export default function UsersPage() {
     role: "user"
   });
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (targetPage = page) => {
+    setLoading(true);
     try {
-      const data = await userService.getUsers();
-      setUsers(data);
+      const data = await userService.getUsers(targetPage, 8);
+      setUsers(data.items);
+      setPaginationInfo({
+        total: data.total,
+        pages: data.pages,
+        size: data.size
+      });
+      setPage(data.page);
     } catch (error) {
       console.error("Failed to fetch users", error);
+      addToast("Failed to fetch users", "error");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchUsers(1);
   }, []);
+
+  const handlePageChange = (newPage: number) => {
+    fetchUsers(newPage);
+  };
 
   const handleDeleteConfirm = async () => {
     if (userToDelete) {
