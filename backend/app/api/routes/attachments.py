@@ -7,9 +7,11 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 
 from app.api import deps
-from app.crud import attachment_crud, task_crud
+from app.crud import attachment_crud
 from app.schemas.attachment_schema import AttachmentCreate, AttachmentResponse
 from app.models.user import User
+from app.models.task import Task
+from app.models.task_share import TaskShare
 
 router = APIRouter()
 
@@ -28,13 +30,15 @@ async def upload_attachment(
     Upload a file attachment for a specific task.
     """
     # 1. Verify task exists and user has access (owner or collaborator)
-    task = db.query(task_crud.Task).filter(task_crud.Task.id == task_id).first()
+    task = db.query(Task).filter(Task.id == task_id).first()
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
         
-    # Check permissions (simplified here: owner only or check TaskShare)
-    from app.models.task_share import TaskShare
-    is_collaborator = db.query(TaskShare).filter(TaskShare.task_id == task_id, TaskShare.user_id == current_user.id).first()
+    # Check permissions: owner or collaborator
+    is_collaborator = db.query(TaskShare).filter(
+        TaskShare.task_id == task_id,
+        TaskShare.user_id == current_user.id
+    ).first()
     if task.user_id != current_user.id and not is_collaborator:
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
@@ -47,7 +51,6 @@ async def upload_attachment(
         shutil.copyfileobj(file.file, buffer)
         
     # 3. Save metadata to DB
-    # Get file size
     file_size = os.path.getsize(file_path)
     
     attachment_in = AttachmentCreate(
@@ -69,7 +72,6 @@ def get_task_attachments(
     """
     Get all attachments linked to a task.
     """
-    # Add access check logic similar to upload
     return attachment_crud.get_attachments_for_task(db, str(task_id))
 
 @router.delete("/{attachment_id}")
@@ -85,7 +87,7 @@ def delete_attachment(
     if not attachment:
         raise HTTPException(status_code=404, detail="Attachment not found")
         
-    task = db.query(task_crud.Task).filter(task_crud.Task.id == attachment.task_id).first()
+    task = db.query(Task).filter(Task.id == attachment.task_id).first()
     if task.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Only task owner can delete attachments")
         

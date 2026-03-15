@@ -7,6 +7,8 @@ from app.api import deps
 from app.crud import task_share_crud, task_crud, user_crud
 from app.schemas.task_share_schema import TaskShareCreate, TaskShareResponse, TaskShareUpdate
 from app.models.user import User
+from app.models.task import Task
+from app.models.task_share import TaskShare
 
 router = APIRouter()
 
@@ -21,7 +23,7 @@ def share_task(
     Share a task with another user.
     """
     # 1. Verify task exists and current user is owner
-    task = db.query(task_crud.Task).filter(task_crud.Task.id == share_in.task_id).first()
+    task = db.query(Task).filter(Task.id == share_in.task_id).first()
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
     if task.user_id != current_user.id:
@@ -33,9 +35,9 @@ def share_task(
         raise HTTPException(status_code=404, detail="Target user not found")
         
     # 3. Check if already shared
-    existing_share = db.query(task_share_crud.TaskShare).filter(
-        task_share_crud.TaskShare.task_id == share_in.task_id,
-        task_share_crud.TaskShare.user_id == share_in.user_id
+    existing_share = db.query(TaskShare).filter(
+        TaskShare.task_id == share_in.task_id,
+        TaskShare.user_id == share_in.user_id
     ).first()
     if existing_share:
         return task_share_crud.update_share_permission(db, existing_share, TaskShareUpdate(permission=share_in.permission))
@@ -51,14 +53,14 @@ def get_task_collaborators(
     """
     Get all collaborators for a specific task.
     """
-    task = db.query(task_crud.Task).filter(task_crud.Task.id == task_id).first()
+    task = db.query(Task).filter(Task.id == task_id).first()
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
         
     # Owner or collaborator can see other collaborators
-    is_collaborator = db.query(task_share_crud.TaskShare).filter(
-        task_share_crud.TaskShare.task_id == task_id,
-        task_share_crud.TaskShare.user_id == current_user.id
+    is_collaborator = db.query(TaskShare).filter(
+        TaskShare.task_id == task_id,
+        TaskShare.user_id == current_user.id
     ).first()
     
     if task.user_id != current_user.id and not is_collaborator:
@@ -75,11 +77,11 @@ def unshare_task(
     """
     Remove a collaborator from a task.
     """
-    share = db.query(task_share_crud.TaskShare).filter(task_share_crud.TaskShare.id == share_id).first()
+    share = db.query(TaskShare).filter(TaskShare.id == share_id).first()
     if not share:
         raise HTTPException(status_code=404, detail="Share record not found")
         
-    task = db.query(task_crud.Task).filter(task_crud.Task.id == share.task_id).first()
+    task = db.query(Task).filter(Task.id == share.task_id).first()
     
     # Only owner or the collaborator themselves can remove the share
     if task.user_id != current_user.id and share.user_id != current_user.id:
