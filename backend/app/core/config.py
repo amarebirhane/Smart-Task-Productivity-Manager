@@ -32,6 +32,12 @@ class Settings(BaseSettings):
     POSTGRES_PORT: str = "5432"
     POSTGRES_DBS: str = "task_manager"
     
+    # S3 / MinIO
+    S3_BUCKET: str = "task-attachments"
+    S3_ENDPOINT_URL: Optional[str] = None
+    S3_ACCESS_KEY: Optional[str] = None
+    S3_SECRET_KEY: Optional[str] = None
+    
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         # Use postgresql+psycopg2 for sync or postgresql+asyncpg for async
