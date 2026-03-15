@@ -3,6 +3,7 @@
     "python.analysis.extraPaths": [
         "${workspaceFolder}/backend",
         "${workspaceFolder}/backend/migrations"
-    ]
+    ],
+    "python.terminal.activateEnvironment": true
 }
 
