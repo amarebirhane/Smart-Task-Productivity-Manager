@@ -42,7 +42,13 @@ class UserUpdate(BaseModel):
     last_name: Optional[str] = Field(None, description="The user's updated last name")
     email: Optional[EmailStr] = Field(None, description="The user's updated email address")
     password: Optional[str] = Field(None, description="The user's updated password")
-    role: Optional[str] = Field(None, description="The user's updated role (Admin only)") # Admin only should use this normally
+    role: Optional[str] = Field(None, description="The user's updated role (Admin only)") 
+    
+    # Notification preferences
+    email_notifications: Optional[bool] = Field(None, description="Toggle email notifications")
+    push_notifications: Optional[bool] = Field(None, description="Toggle push notifications")
+    task_updates: Optional[bool] = Field(None, description="Toggle task update alerts")
+    system_alerts: Optional[bool] = Field(None, description="Toggle system wide alerts")
 
     @field_validator('username', 'first_name', 'last_name', mode='before')
     @classmethod
@@ -90,6 +96,13 @@ class UserResponse(UserBase):
     role: str = Field(..., description="The role assigned to the user (e.g., user, manager, admin)")
     is_active: Optional[bool] = Field(True, description="Whether the user account is active")
     is_two_factor_enabled: Optional[bool] = Field(False, description="Whether Two-Factor Authentication is enabled")
+    
+    # Notification preferences
+    email_notifications: bool = Field(True, description="Whether email notifications are enabled")
+    push_notifications: bool = Field(True, description="Whether push notifications are enabled")
+    task_updates: bool = Field(True, description="Whether task update alerts are enabled")
+    system_alerts: bool = Field(True, description="Whether system wide alerts are enabled")
+    
     created_at: datetime = Field(..., description="The date and time the user account was created")
 
     class Config:

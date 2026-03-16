@@ -18,5 +18,12 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     is_two_factor_enabled = Column(Boolean, default=False)
     two_factor_secret = Column(String, nullable=True)
+    
+    # Notification preferences
+    email_notifications = Column(Boolean, default=True)
+    push_notifications = Column(Boolean, default=True)
+    task_updates = Column(Boolean, default=True)
+    system_alerts = Column(Boolean, default=True)
+    
     created_at = Column(DateTime, default=datetime.utcnow)
 
