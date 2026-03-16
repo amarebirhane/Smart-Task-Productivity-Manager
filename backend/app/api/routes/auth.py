@@ -36,8 +36,6 @@ def register(
     
     return user
 
-    return user
-
 @router.post("/login", response_model=Token, summary="Login and get access token")
 @limiter.limit("5/minute")
 def login(

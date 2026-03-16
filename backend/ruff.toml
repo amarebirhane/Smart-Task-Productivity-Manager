@@ -1,8 +1,7 @@
-[tool.ruff]
 line-length = 88
 target-version = "py312"
 
-[tool.ruff.lint]
+[lint]
 select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
@@ -14,10 +13,10 @@ select = [
 ]
 ignore = []
 
-[tool.ruff.lint.isort]
+[lint.isort]
 known-first-party = ["app"]
 
-[tool.ruff.format]
+[format]
 quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
