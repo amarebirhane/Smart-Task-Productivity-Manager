@@ -5,7 +5,7 @@ import { Task } from "@/types/task";
 import { taskService } from "@/features/tasks/taskService";
 import TaskCard from "@/components/TaskCard";
 import TaskForm from "@/components/TaskForm";
-import { Plus, Search, Filter, Loader2 } from "lucide-react";
+import { Plus, Search, Filter, Loader2, Trash2 } from "lucide-react";
 import { useTasks } from "@/hooks/useTasks";
 
 export default function TaskList() {
@@ -14,10 +14,19 @@ export default function TaskList() {
   const [filter, setFilter] = useState("all");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this task?")) {
-      await apiDeleteTask(id);
+  const handleDelete = (id: string) => {
+    const task = tasks.find(t => t.id === id);
+    if (task) {
+      setTaskToDelete(task);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (taskToDelete) {
+      await apiDeleteTask(taskToDelete.id);
+      setTaskToDelete(null);
     }
   };
 
@@ -108,6 +117,38 @@ export default function TaskList() {
           onSave={() => { setIsFormOpen(false); refreshTasks(); }}
           onCancel={() => setIsFormOpen(false)}
         />
+      )}
+
+      {/* Task Delete Modal */}
+      {taskToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="absolute inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm cursor-pointer" onClick={() => setTaskToDelete(null)} />
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-scale-up relative z-10">
+            <div className="p-6 text-center space-y-4">
+              <div className="w-16 h-16 bg-rose-100 dark:bg-rose-500/20 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                <Trash2 size={24} />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Delete Task?</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">
+                Are you sure you want to delete <span className="font-bold text-slate-700 dark:text-slate-300">"{taskToDelete.title}"</span>? This action cannot be undone.
+              </p>
+              <div className="flex gap-3 pt-4">
+                <button 
+                  onClick={() => setTaskToDelete(null)}
+                  className="flex-1 py-2.5 text-slate-600 dark:text-slate-300 font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={confirmDelete}
+                  className="flex-1 py-2.5 text-white font-bold bg-rose-600 hover:bg-rose-700 rounded-xl transition-all shadow-lg shadow-rose-200 dark:shadow-none"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
