@@ -108,6 +108,7 @@ class UserResponse(UserBase):
     push_notifications: bool = Field(True, description="Whether push notifications are enabled")
     task_updates: bool = Field(True, description="Whether task update alerts are enabled")
     system_alerts: bool = Field(True, description="Whether system wide alerts are enabled")
+    profile_image_url: Optional[str] = Field(None, description="The URL to the user's profile image")
     
     created_at: datetime = Field(..., description="The date and time the user account was created")
 
