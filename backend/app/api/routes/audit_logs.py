@@ -6,10 +6,13 @@ from app.schemas.audit_schema import AuditLogResponse
 from app.schemas.pagination_schema import PaginatedResponse
 from app.models.audit_log import AuditLog
 
+from app.utils.cache import cache
+
 router = APIRouter()
 
-@router.get("/", response_model=PaginatedResponse[AuditLogResponse])
-def get_audit_logs(
+@router.get("/", response_model=List[AuditLogResponse])
+@cache(expire=3600)
+def read_audit_logs(
     db: Session = Depends(deps.get_db),
     skip: int = Query(0, ge=0),
     limit: int = Query(8, ge=1, le=500), # Default to 8
