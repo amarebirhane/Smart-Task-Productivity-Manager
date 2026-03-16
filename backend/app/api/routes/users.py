@@ -8,6 +8,9 @@ from app.schemas.user_schema import UserResponse, UserUpdateMe, PasswordChange, 
 from app.schemas.pagination_schema import PaginatedResponse
 from app.services.auth_service import auth_service
 from app.models.user import User
+from fastapi import File, UploadFile
+from app.services.storage_service import storage_service
+import uuid
 
 router = APIRouter()
 
@@ -32,6 +35,41 @@ def update_user_me(
     """
     user = update_user(db, db_user=current_user, user_in=UserUpdate(**user_in.model_dump()))
     return user
+
+@router.post("/me/avatar", response_model=UserResponse)
+async def upload_avatar(
+    *,
+    db: Session = Depends(deps.get_db),
+    file: UploadFile = File(...),
+    current_user: User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Upload own profile avatar.
+    """
+    # Validate file type
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image")
+    
+    # Generate unique filename
+    extension = file.filename.split(".")[-1]
+    filename = f"avatars/{current_user.id}/{uuid.uuid4()}.{extension}"
+    
+    # Upload to storage
+    contents = await file.read()
+    success = storage_service.upload_file(contents, filename, file.content_type)
+    
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to upload image to storage")
+    
+    # Generate presigned URL (or public URL if configured)
+    url = storage_service.get_presigned_url(filename)
+    
+    # Update user record
+    current_user.profile_image_url = url
+    db.commit()
+    db.refresh(current_user)
+    
+    return current_user
 
 @router.patch("/me/password")
 def change_password_me(
