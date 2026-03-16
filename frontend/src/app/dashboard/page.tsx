@@ -72,15 +72,24 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Enterprise Overview</h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Your central command for all operations</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 gap-6">
+        <div className="flex items-center gap-6">
+          <div className="h-20 w-20 rounded-2xl overflow-hidden bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center border-4 border-white dark:border-slate-800 shadow-xl">
+            {user?.profile_image_url ? (
+              <img src={user.profile_image_url} alt={user.username} className="h-full w-full object-cover" />
+            ) : (
+              <TrendingUp size={32} className="text-primary-600" />
+            )}
+          </div>
+          <div>
+            <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Enterprise Overview</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Welcome back, <span className="text-primary-600 font-bold">{user?.username}</span> • Central Command</p>
+          </div>
         </div>
-        <div className="flex gap-3">
-          {user?.role === "user" && <Link href="/dashboard/my-tasks" className="btn-primary py-2 px-4 text-sm">My Workplace</Link>}
-          {(user?.role === "manager" || user?.role === "admin") && <Link href="/dashboard/team" className="btn-primary py-2 px-4 text-sm bg-emerald-600 hover:bg-emerald-700">Team Velocity</Link>}
-          {user?.role === "admin" && <Link href="/dashboard/admin" className="btn-primary py-2 px-4 text-sm bg-purple-600 hover:bg-purple-700">System Health</Link>}
+        <div className="flex flex-wrap gap-3 w-full md:w-auto">
+          {user?.role === "user" && <Link href="/dashboard/my-tasks" className="btn-primary py-2.5 px-6 text-sm flex-1 md:flex-none text-center">My Workplace</Link>}
+          {(user?.role === "manager" || user?.role === "admin") && <Link href="/dashboard/team" className="btn-primary py-2.5 px-6 text-sm bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-100 dark:shadow-none flex-1 md:flex-none text-center">Team Velocity</Link>}
+          {user?.role === "admin" && <Link href="/dashboard/admin" className="btn-primary py-2.5 px-6 text-sm bg-purple-600 hover:bg-purple-700 shadow-lg shadow-purple-100 dark:shadow-none flex-1 md:flex-none text-center">System Health</Link>}
         </div>
       </div>
 

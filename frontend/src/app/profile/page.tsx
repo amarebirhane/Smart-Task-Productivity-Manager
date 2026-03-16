@@ -6,10 +6,11 @@ import { authService } from "@/features/auth/authService";
 import AuthenticatedLayout from "@/components/AuthenticatedLayout";
 import { getErrorMessage } from "@/utils/errorHandler";
 import { useToasts } from "@/components/Toast";
-import { User, UserCheck, Mail, Loader2, Save } from "lucide-react";
+import AvatarUpload from "@/components/AvatarUpload";
 
 export default function ProfilePage() {
   const { user, setUser } = useAuth();
+  // ... existing code ...
   const [formData, setFormData] = useState({
     username: "",
     email: "",
