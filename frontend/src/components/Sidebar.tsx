@@ -16,20 +16,18 @@ import {
   User,
   Activity,
   ChevronLeft,
-  ChevronRight,
-  Bell
+  ChevronRight
 } from "lucide-react";
 import { clsx } from "clsx";
 
 const navItems = [
-  { name: "Overview", href: "/dashboard", icon: LayoutDashboard, roles: ["user", "manager", "admin"] },
-  { name: "Notifications", href: "/settings?tab=notifications", icon: Bell, roles: ["user", "manager", "admin"] },
-  { name: "My Tasks", href: "/dashboard/my-tasks", icon: CheckSquare, roles: ["user", "manager", "admin"] },
-  { name: "Team Analytics", href: "/dashboard/team", icon: TrendingUp, roles: ["manager", "admin"] },
-  { name: "Profile", href: "/profile", icon: User, roles: ["user", "manager", "admin"] }, // Added Profile link
-  { name: "System Health", href: "/dashboard/admin", icon: PieChart, roles: ["admin"] },
-  { name: "Platform Users", href: "/users", icon: Users, roles: ["admin"] },
-  { name: "Audit Logs", href: "/dashboard/audit-logs", icon: Activity, roles: ["admin"] },
+  { name: "Overview", href: "/dashboard", icon: LayoutDashboard, roles: ["user", "manager", "admin"], color: "text-indigo-500" },
+  { name: "My Tasks", href: "/dashboard/my-tasks", icon: CheckSquare, roles: ["user", "manager", "admin"], color: "text-emerald-500" },
+  { name: "Team Analytics", href: "/dashboard/team", icon: TrendingUp, roles: ["manager", "admin"], color: "text-amber-500" },
+  { name: "Profile", href: "/profile", icon: User, roles: ["user", "manager", "admin"], color: "text-violet-500" },
+  { name: "System Health", href: "/dashboard/admin", icon: PieChart, roles: ["admin"], color: "text-rose-500" },
+  { name: "Platform Users", href: "/users", icon: Users, roles: ["admin"], color: "text-blue-500" },
+  { name: "Audit Logs", href: "/dashboard/audit-logs", icon: Activity, roles: ["admin"], color: "text-slate-500" },
 ];
 
 interface SidebarProps {
@@ -83,7 +81,13 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                     : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
                 )}
               >
-                <Icon className={clsx("h-5 w-5", isActive ? "text-primary-600" : "text-slate-400 group-hover:text-slate-600")} />
+                <Icon 
+                  size={20} 
+                  className={clsx(
+                    "transition-colors duration-200",
+                    isActive ? "text-primary-600" : `${item.color} opacity-70 group-hover:opacity-100`
+                  )} 
+                />
                 {isOpen && <span className="ml-3">{item.name}</span>}
               </Link>
             );
@@ -95,7 +99,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
             href="/settings"
             className="flex items-center p-2 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 transition-all duration-200"
           >
-            <Settings className="h-5 w-5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300" />
+            <Settings size={20} className="text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors" />
             {isOpen && <span className="ml-3">Settings</span>}
           </Link>
           
