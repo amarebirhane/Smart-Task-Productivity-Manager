@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict
 
 class AttachmentBase(BaseModel):
     task_id: UUID = Field(..., description="The unique ID of the task this attachment belongs to")
