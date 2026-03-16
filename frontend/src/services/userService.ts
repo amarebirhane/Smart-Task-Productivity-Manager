@@ -22,4 +22,9 @@ export const userService = {
     const response = await api.post<User>("/auth/register", user);
     return response.data;
   },
+
+  updateMe: async (data: Partial<User>) => {
+    const response = await api.put<User>("/users/me", data);
+    return response.data;
+  },
 };

@@ -10,6 +10,11 @@ export interface User {
   is_active: boolean;
   is_two_factor_enabled: boolean;
   profile_image_url?: string;
+  // Notification preferences
+  email_notifications: boolean;
+  push_notifications: boolean;
+  task_updates: boolean;
+  system_alerts: boolean;
   created_at: string;
 }
 
