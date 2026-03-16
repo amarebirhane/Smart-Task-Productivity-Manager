@@ -9,8 +9,11 @@ from app.schemas.pagination_schema import PaginatedResponse
 from app.services.auth_service import auth_service
 from app.models.user import User
 from fastapi import File, UploadFile
+from fastapi.responses import StreamingResponse
 from app.services.storage_service import storage_service
 import uuid
+import csv
+import io
 
 router = APIRouter()
 
@@ -85,6 +88,43 @@ def change_password_me(
         db, user=current_user, old_password=password_in.old_password, new_password=password_in.new_password
     )
     return {"msg": "Password updated successfully"}
+
+@router.get("/export/csv")
+def export_users_csv(
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_admin_user),
+) -> Any:
+    """
+    Export all users to CSV. (Admin only)
+    """
+    users = db.query(User).all()
+    
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Headers
+    writer.writerow(["ID", "Username", "First Name", "Last Name", "Email", "Role", "Active", "Created At"])
+    
+    # Data
+    for user in users:
+        writer.writerow([
+            str(user.id),
+            user.username,
+            user.first_name,
+            user.last_name,
+            user.email,
+            user.role,
+            user.is_active,
+            user.created_at.isoformat()
+        ])
+    
+    output.seek(0)
+    
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=users_export.csv"}
+    )
 
 @router.get("/", response_model=PaginatedResponse[UserResponse])
 def read_users(
