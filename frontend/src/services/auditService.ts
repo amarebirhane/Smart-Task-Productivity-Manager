@@ -19,4 +19,17 @@ export const auditService = {
     const response = await api.get<PaginatedResponse<AuditLog>>("/audit-logs/", { params: { skip, limit } });
     return response.data;
   },
+
+  exportLogsPDF: async () => {
+    const response = await api.get("/audit-logs/export/pdf", {
+      responseType: 'blob'
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'audit_logs_export.pdf');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  },
 };
