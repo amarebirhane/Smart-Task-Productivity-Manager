@@ -1,6 +1,6 @@
 from typing import Optional, Any
 from datetime import datetime
-from pydantic import BaseModel, UUID4
+from pydantic import BaseModel, UUID4, Field
 
 class AuditLogBase(BaseModel):
     action: str = Field(..., description="The specific action performed (e.g., login, create_task)")
