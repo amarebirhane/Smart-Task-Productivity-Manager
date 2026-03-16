@@ -1,7 +1,7 @@
 import os
 from typing import Optional, Any
 from pydantic import field_validator
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Smart Task & Productivity Manager"
@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     SMTP_USER: Optional[str] = None
     SMTP_PASSWORD: Optional[str] = None
     EMAILS_FROM_EMAIL: Optional[str] = None
-    EMAILS_FROM_NAME: Optional[str] = settings_name if (settings_name := os.getenv("PROJECT_NAME")) else "Smart Task Manager"
+    EMAILS_FROM_NAME: Optional[str] = os.getenv("PROJECT_NAME", "Smart Task Manager")
     
     # First Superuser
     FIRST_SUPERUSER: str = "admin@example.com"
@@ -42,6 +42,13 @@ class Settings(BaseSettings):
     # Environment
     ENVIRONMENT: str = "development" # development, production
 
+    # Redis
+    REDIS_URL: Optional[str] = None
+
+    # MinIO Root (used for setup/admin)
+    MINIO_ROOT_USER: Optional[str] = None
+    MINIO_ROOT_PASSWORD: Optional[str] = None
+
     @field_validator("SMTP_PASSWORD", "S3_SECRET_KEY", "SECRET_KEY", mode="after")
     @classmethod
     def check_secrets_in_production(cls, v: Optional[str], info: Any) -> Optional[str]:
@@ -54,7 +61,10 @@ class Settings(BaseSettings):
         # Use postgresql+psycopg2 for sync or postgresql+asyncpg for async
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DBS}"
 
-    class Config:
-        env_file = ".env"
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=True,
+        extra="ignore"
+    )
 
 settings = Settings()

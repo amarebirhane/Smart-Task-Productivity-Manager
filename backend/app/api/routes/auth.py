@@ -103,6 +103,7 @@ def verify_2fa_setup(
 @router.post("/password-reset/request", summary="Request password reset token")
 @limiter.limit("3/minute")
 def request_password_reset(
+    request: Request,
     data: PasswordResetRequest,
     db: Session = Depends(deps.get_db)
 ) -> Any:
@@ -119,6 +120,7 @@ def request_password_reset(
 @router.post("/password-reset/reset", summary="Reset password using token")
 @limiter.limit("3/minute")
 def reset_password(
+    request: Request,
     data: PasswordReset,
     db: Session = Depends(deps.get_db),
     two_fa_code: str = Query(None, alias="code")
