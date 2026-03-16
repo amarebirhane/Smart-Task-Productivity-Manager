@@ -11,8 +11,9 @@ import { useToasts } from "@/components/Toast";
 import api from "@/services/api";
 import { authService } from "@/features/auth/authService";
 import { 
-  Settings as SettingsIcon, Shield, Globe, Bell, User, Save, Loader2, AlertCircle, X, Lock, CheckCircle2, Sun, Moon, Monitor, Palette, Database, DownloadCloud, Trash2, Plus, RefreshCcw, History, Info, Mail
+  Settings as SettingsIcon, Shield, Globe, Bell, User, Save, Loader2, AlertCircle, X, Lock, CheckCircle2, Sun, Moon, Monitor, Palette, Database, DownloadCloud, Trash2, Plus, RefreshCcw, History, Info, Mail, Camera
 } from "lucide-react";
+import AvatarUpload from "@/components/AvatarUpload";
 import { useTheme } from "@/context/ThemeContext";
 import { QRCodeSVG } from "qrcode.react";
 import { backupService } from "@/services/backupService";
