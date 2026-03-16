@@ -22,7 +22,11 @@ from app.core.config import settings
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Run migrations and seed data at startup."""
+    """Run migrations and seed data at startup unless in testing."""
+    if settings.ENVIRONMENT == "testing":
+        yield
+        return
+
     from app.db.alembic_utils import run_upgrade
     from app.db.database import SessionLocal
     from app.db.init_db import init_db

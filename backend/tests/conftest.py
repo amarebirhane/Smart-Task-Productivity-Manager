@@ -4,10 +4,14 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
+from app.core.config import settings
+
+# Force ENVIRONMENT to testing for all tests
+settings.ENVIRONMENT = "testing"
+
 from app.main import app
 from app.api.deps import get_db
 from app.db.base import Base
-from app.core.config import settings
 
 # Use an in-memory SQLite database for testing to ensure speed and isolation
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
