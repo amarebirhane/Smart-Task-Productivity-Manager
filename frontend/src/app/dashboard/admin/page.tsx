@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import api from "@/services/api";
 import { Shield, Activity, HardDrive, Server, Loader2 } from "lucide-react";
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -17,6 +18,40 @@ const systemLoadData = [
 ];
 
 export default function AdminDashboard() {
+  const [health, setHealth] = useState<any>(null);
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [healthRes, analyticsRes] = await Promise.all([
+          api.get("/health"),
+          api.get("/analytics/system")
+        ]);
+        setHealth(healthRes.data);
+        setAnalytics(analyticsRes.data);
+      } catch (error) {
+        console.error("Failed to fetch admin dashboard data", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const isSystemHealthy = health?.status === "healthy";
+
+  if (loading) {
+    return (
+      <ProtectedRoute allowedRoles={["admin"]}>
+        <div className="flex h-[60vh] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
   return (
     <ProtectedRoute allowedRoles={["admin"]}>
       <div className="space-y-8 animate-fade-in">
@@ -25,8 +60,8 @@ export default function AdminDashboard() {
             <h1 className="text-2xl font-bold text-slate-900">System Analytics</h1>
             <p className="text-sm text-slate-500">Infrastructure and platform health monitoring</p>
           </div>
-          <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold ring-1 ring-emerald-200">
-            <Activity className="h-3 w-3" /> System Live
+          <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold ring-1 ${isSystemHealthy ? "bg-emerald-50 text-emerald-700 ring-emerald-200" : "bg-rose-50 text-rose-700 ring-rose-200"}`}>
+            <Activity className="h-3 w-3" /> {isSystemHealthy ? "System Live" : "System Degraded"}
           </div>
         </div>
 
@@ -37,8 +72,10 @@ export default function AdminDashboard() {
                 <Server className="h-6 w-6" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-500">API Health</p>
-                <h3 className="text-2xl font-bold text-slate-900">99.9%</h3>
+                <p className="text-sm font-medium text-slate-500">DB Health</p>
+                <h3 className="text-2xl font-bold text-slate-900">
+                  {health?.components?.database === "healthy" ? "Online" : "Error"}
+                </h3>
               </div>
             </div>
           </div>
@@ -48,8 +85,10 @@ export default function AdminDashboard() {
                 <HardDrive className="h-6 w-6" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-500">Storage Usage</p>
-                <h3 className="text-2xl font-bold text-slate-900">14.2 GB</h3>
+                <p className="text-sm font-medium text-slate-500">Redis Cache</p>
+                <h3 className="text-2xl font-bold text-slate-900">
+                  {health?.components?.redis === "healthy" ? "Active" : "Offline"}
+                </h3>
               </div>
             </div>
           </div>
@@ -59,8 +98,8 @@ export default function AdminDashboard() {
                 <Shield className="h-6 w-6" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-500">Active Sessions</p>
-                <h3 className="text-2xl font-bold text-slate-900">248</h3>
+                <p className="text-sm font-medium text-slate-500">Total Users</p>
+                <h3 className="text-2xl font-bold text-slate-900">{analytics?.total_users || 0}</h3>
               </div>
             </div>
           </div>
