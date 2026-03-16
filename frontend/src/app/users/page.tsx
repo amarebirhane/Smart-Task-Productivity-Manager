@@ -142,7 +142,7 @@ export default function UsersPage() {
 
   return (
     <ProtectedRoute allowedRoles={["admin"]}>
-      <div className="space-y-6">
+      <div className="space-y-6 animate-fade-in">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 font-premium">System Users</h1>
