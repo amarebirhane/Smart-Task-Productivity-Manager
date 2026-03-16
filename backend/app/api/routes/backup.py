@@ -11,7 +11,7 @@ router = APIRouter()
 
 @router.post("/create", summary="Create a new database backup")
 def create_backup(
-    current_user: Any = Depends(deps.get_current_active_superuser)
+    current_user: Any = Depends(deps.get_current_active_admin_user)
 ) -> Any:
     """
     Create a new database backup. Only superusers can trigger backups.
@@ -26,7 +26,7 @@ def create_backup(
 
 @router.get("/list", response_model=List[str], summary="List all backups")
 def list_backups(
-    current_user: Any = Depends(deps.get_current_active_superuser)
+    current_user: Any = Depends(deps.get_current_active_admin_user)
 ) -> Any:
     """
     List all available database backup files.
@@ -36,7 +36,7 @@ def list_backups(
 @router.get("/download/{filename}", summary="Download a backup file")
 def download_backup(
     filename: str,
-    current_user: Any = Depends(deps.get_current_active_superuser)
+    current_user: Any = Depends(deps.get_current_active_admin_user)
 ) -> Any:
     """
     Download a specific database backup file.
@@ -56,7 +56,7 @@ def download_backup(
 @router.delete("/{filename}", summary="Delete a backup file")
 def delete_backup(
     filename: str,
-    current_user: Any = Depends(deps.get_current_active_superuser)
+    current_user: Any = Depends(deps.get_current_active_admin_user)
 ) -> Any:
     """
     Delete a database backup file.
