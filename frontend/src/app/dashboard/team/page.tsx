@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import api from "@/services/api";
 import { Users, TrendingUp, CheckSquare, Clock } from "lucide-react";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -17,6 +18,23 @@ const teamEfficiencyData = [
 ];
 
 export default function TeamDashboard() {
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await api.get("/analytics/system");
+        setAnalytics(res.data);
+      } catch (error) {
+        console.error("Failed to fetch team dashboard data", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <ProtectedRoute allowedRoles={["manager", "admin"]}>
       <div className="space-y-8 animate-fade-in">
@@ -33,7 +51,9 @@ export default function TeamDashboard() {
               </div>
               <div>
                 <p className="text-sm font-medium text-slate-500">Active Team Members</p>
-                <h3 className="text-2xl font-bold text-slate-900">12</h3>
+                <h3 className="text-2xl font-bold text-slate-900">
+                  {loading ? "..." : analytics?.total_users || 0}
+                </h3>
               </div>
             </div>
           </div>
@@ -43,8 +63,10 @@ export default function TeamDashboard() {
                 <CheckSquare className="h-6 w-6" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-500">Tasks Completed (Weekly)</p>
-                <h3 className="text-2xl font-bold text-slate-900">48</h3>
+                <p className="text-sm font-medium text-slate-500">Total Tasks in System</p>
+                <h3 className="text-2xl font-bold text-slate-900">
+                  {loading ? "..." : analytics?.total_tasks || 0}
+                </h3>
               </div>
             </div>
           </div>
