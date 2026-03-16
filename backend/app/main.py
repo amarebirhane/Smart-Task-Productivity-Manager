@@ -80,7 +80,7 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Import routes after middleware is set up
-from app.api.routes import auth, users, tasks, categories, analytics, settings as settings_routes, audit_logs, notifications, collaboration, attachments, health  # noqa: E402
+from app.api.routes import auth, users, tasks, categories, analytics, settings as settings_routes, audit_logs, notifications, collaboration, attachments, health, backup  # noqa: E402
 
 app.include_router(health.router, prefix=f"{settings.API_V1_STR}/health", tags=["monitoring"])
 app.include_router(auth.router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
@@ -93,6 +93,7 @@ app.include_router(audit_logs.router, prefix=f"{settings.API_V1_STR}/audit-logs"
 app.include_router(notifications.router, prefix=f"{settings.API_V1_STR}/notifications", tags=["notifications"])
 app.include_router(collaboration.router, prefix=f"{settings.API_V1_STR}/collaboration", tags=["collaboration"])
 app.include_router(attachments.router, prefix=f"{settings.API_V1_STR}/attachments", tags=["attachments"])
+app.include_router(backup.router, prefix=f"{settings.API_V1_STR}/backup", tags=["backup"])
 
 
 @app.websocket("/ws/{user_id}")

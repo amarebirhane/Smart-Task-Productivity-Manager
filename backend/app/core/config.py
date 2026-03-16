@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     
     # Environment
     ENVIRONMENT: str = "development" # development, production
+    BACKUP_DIR: str = "backups"
 
     # Redis
     REDIS_URL: Optional[str] = None
