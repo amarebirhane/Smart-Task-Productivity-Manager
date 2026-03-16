@@ -24,6 +24,7 @@ class User(Base):
     push_notifications = Column(Boolean, default=True)
     task_updates = Column(Boolean, default=True)
     system_alerts = Column(Boolean, default=True)
+    profile_image_url = Column(String, nullable=True)
     
     created_at = Column(DateTime, default=datetime.utcnow)
 
