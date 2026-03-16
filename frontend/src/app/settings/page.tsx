@@ -160,18 +160,6 @@ export default function SettingsPage() {
     }
   };
 
-  const fetchBackups = async () => {
-    setLoadingBackups(true);
-    try {
-      const data = await backupService.getBackups();
-      setBackups(data);
-    } catch (error) {
-      addToast("Failed to fetch backups.", "error");
-    } finally {
-      setLoadingBackups(false);
-    }
-  };
-
   const handleCreateBackup = async () => {
     setCreatingBackup(true);
     try {
