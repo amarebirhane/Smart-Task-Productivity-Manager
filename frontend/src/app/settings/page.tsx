@@ -21,10 +21,18 @@ import {
   Sun,
   Moon,
   Monitor,
-  Palette
+  Palette,
+  Database,
+  DownloadCloud,
+  Trash2,
+  Plus,
+  RefreshCcw,
+  History
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { QRCodeSVG } from "qrcode.react";
+import { backupService } from "@/services/backupService";
+import { format } from "date-fns";
 
 interface Setting {
   key: string;
@@ -54,9 +62,26 @@ export default function SettingsPage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // Backup States
+  const [backups, setBackups] = useState<string[]>([]);
+  const [loadingBackups, setLoadingBackups] = useState(false);
+  const [creatingBackup, setCreatingBackup] = useState(false);
+
   useEffect(() => {
     fetchSettings();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === "backups" && user?.role === "admin") {
+      fetchBackups();
+    }
+  }, [activeTab, user]);
+
+  useEffect(() => {
+    if (activeTab === "backups" && user?.role === "admin") {
+      fetchBackups();
+    }
+  }, [activeTab, user]);
 
   const fetchSettings = async () => {
     try {
@@ -138,6 +163,7 @@ export default function SettingsPage() {
 
   if (user?.role === "admin") {
     tabs.push({ id: "system", label: "System", icon: SettingsIcon });
+    tabs.push({ id: "backups", label: "Backups", icon: Database });
   }
 
   return (
@@ -347,6 +373,83 @@ export default function SettingsPage() {
                       <div className="text-center py-12 p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
                         <p className="text-slate-500 dark:text-slate-400">No system settings found.</p>
                         <button className="mt-4 btn-primary-outline text-xs">Create Initial Settings</button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "backups" && user?.role === "admin" && (
+                <div className="space-y-8">
+                  <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800">
+                    <div>
+                      <h3 className="font-bold text-slate-900 dark:text-slate-100">Database Backups</h3>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">Create and manage your database snapshots</p>
+                    </div>
+                    <button 
+                      onClick={handleCreateBackup}
+                      disabled={creatingBackup}
+                      className="btn-primary flex items-center gap-2 px-6 py-2.5 text-sm shadow-lg shadow-primary-200"
+                    >
+                      {creatingBackup ? <Loader2 size={18} className="animate-spin" /> : <Plus size={18} />}
+                      Create New Backup
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {loadingBackups ? (
+                      <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-4">
+                        <Loader2 className="animate-spin text-primary-600" size={32} />
+                        <p className="text-sm font-medium">Scanning backup directory...</p>
+                      </div>
+                    ) : backups.length > 0 ? (
+                      <div className="grid grid-cols-1 gap-3">
+                        {backups.map(filename => (
+                          <div key={filename} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-primary-100 transition-all group">
+                            <div className="flex items-center gap-4">
+                              <div className="h-10 w-10 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-primary-600 transition-colors">
+                                <History size={20} />
+                              </div>
+                              <div>
+                                <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{filename}</p>
+                                <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">
+                                  {filename.includes('_') ? format(new Date(filename.split('_')[1].substring(0, 4), parseInt(filename.split('_')[1].substring(4, 6)) - 1, filename.split('_')[1].substring(6, 8)), 'PPP') : 'Snapshot'}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <a 
+                                href={backupService.getDownloadUrl(filename)}
+                                download
+                                className="p-2.5 text-slate-400 hover:text-primary-600 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all tooltip"
+                                title="Download"
+                              >
+                                <DownloadCloud size={18} />
+                              </a>
+                              <button 
+                                onClick={() => handleDeleteBackup(filename)}
+                                className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all"
+                                title="Delete"
+                              >
+                                <Trash2 size={18} />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-20 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+                        <Database className="mx-auto h-12 w-12 text-slate-200 mb-4" />
+                        <h3 className="font-bold text-slate-900 dark:text-slate-100">No Backups Yet</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xs mx-auto mt-2">
+                          Protect your data by creating periodic snapshots of your database.
+                        </p>
+                        <button 
+                          onClick={handleCreateBackup}
+                          className="mt-6 btn-primary-outline text-xs px-8"
+                        >
+                          Trigger First Backup
+                        </button>
                       </div>
                     )}
                   </div>
