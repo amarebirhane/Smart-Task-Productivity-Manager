@@ -5,8 +5,8 @@ from fastapi import HTTPException, status
 
 from app.core.config import settings
 from app.crud.user_crud import get_user_by_email, get_user_by_username, create_user, update_user
-from app.schemas.user_schema import UserCreate, UserUpdate
-from app.utils.token import create_access_token
+from app.schemas.user_schema import UserCreate, UserUpdate, Token
+from app.utils.token import create_access_token, create_refresh_token, verify_token
 from app.utils.hash import verify_password
 from app.services.audit_service import audit_service
 import pyotp
@@ -181,19 +181,51 @@ class AuthService:
     @staticmethod
     def create_login_token(user_id: str):
         """
-        Generates a new access token for a user after successful login.
-        
-        Args:
-            user_id: The unique identifier of the user
-            
-        Returns:
-            A dictionary containing the access token and token type
+        Generates a new access token and refresh token for a user.
         """
         access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         return {
             "access_token": create_access_token(
                 user_id, expires_delta=access_token_expires
             ),
+            "refresh_token": create_refresh_token(user_id),
+            "token_type": "bearer",
+        }
+
+    @staticmethod
+    def refresh_access_token(db: Session, refresh_token: str):
+        """
+        Exchanges a valid refresh token for a new access token.
+        """
+        payload = verify_token(refresh_token)
+        if not payload or not payload.get("refresh"):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or expired refresh token",
+            )
+        
+        user_id: str = payload.get("sub")
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token payload",
+            )
+        
+        # Optionally, verify user still exists and is active
+        from app.crud.user_crud import get_user
+        user = get_user(db, user_id=user_id)
+        if not user or not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found or inactive",
+            )
+
+        access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        return {
+            "access_token": create_access_token(
+                user_id, expires_delta=access_token_expires
+            ),
+            "refresh_token": refresh_token, # Send same refresh token back or rotate it
             "token_type": "bearer",
         }
 
