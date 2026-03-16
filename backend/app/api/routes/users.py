@@ -14,6 +14,7 @@ from app.services.storage_service import storage_service
 import uuid
 import csv
 import io
+from app.core.config import settings
 
 router = APIRouter()
 
@@ -177,6 +178,8 @@ def delete_user_route(
     user = get_user(db, user_id=user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    if user.email == settings.FIRST_SUPERUSER:
+        raise HTTPException(status_code=403, detail="System administrator cannot be deleted")
     delete_user(db, user)
     return user
 
@@ -194,5 +197,10 @@ def update_user_admin(
     user = get_user(db, user_id=user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    
+    # Prevent deactivating the primary system admin
+    if user.email == settings.FIRST_SUPERUSER and getattr(user_in, 'is_active', None) is False:
+        raise HTTPException(status_code=403, detail="System administrator cannot be deactivated")
+        
     user = update_user(db, db_user=user, user_in=user_in)
     return user
