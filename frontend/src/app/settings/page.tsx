@@ -11,7 +11,7 @@ import { useToasts } from "@/components/Toast";
 import api from "@/services/api";
 import { authService } from "@/features/auth/authService";
 import { 
-  Settings as SettingsIcon, Shield, Globe, Bell, User, Save, Loader2, AlertCircle, X, Lock, CheckCircle2, Sun, Moon, Monitor, Palette, Database, DownloadCloud, Trash2, Plus, RefreshCcw, History, Info, Mail, Camera, Eye, EyeOff
+  Settings as SettingsIcon, Shield, Globe, Bell, User, Save, Loader2, AlertCircle, X, Lock, CheckCircle2, Sun, Moon, Monitor, Palette, Database, DownloadCloud, Trash2, Plus, RefreshCcw, History, Info, Mail, Camera, Eye, EyeOff, AlertTriangle
 } from "lucide-react";
 import AvatarUpload from "@/components/AvatarUpload";
 import { useTheme } from "@/context/ThemeContext";
@@ -64,6 +64,8 @@ export default function SettingsPage() {
   const [backups, setBackups] = useState<string[]>([]);
   const [loadingBackups, setLoadingBackups] = useState(false);
   const [creatingBackup, setCreatingBackup] = useState(false);
+  const [backupToDelete, setBackupToDelete] = useState<string | null>(null);
+  const [backupToDownload, setBackupToDownload] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSettings();
@@ -202,14 +204,16 @@ export default function SettingsPage() {
     }
   };
 
-  const handleDeleteBackup = async (filename: string) => {
-    if (!confirm(`Are you sure you want to delete backup ${filename}?`)) return;
+  const handleDeleteBackup = async () => {
+    if (!backupToDelete) return;
     try {
-      await backupService.deleteBackup(filename);
+      await backupService.deleteBackup(backupToDelete);
       addToast("Backup deleted successfully.", "success");
       fetchBackups();
     } catch (error) {
       addToast("Failed to delete backup.", "error");
+    } finally {
+      setBackupToDelete(null);
     }
   };
 
@@ -496,16 +500,15 @@ export default function SettingsPage() {
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              <a 
-                                href={backupService.getDownloadUrl(filename)}
-                                download
+                              <button 
+                                onClick={() => setBackupToDownload(filename)}
                                 className="p-2.5 text-slate-400 hover:text-primary-600 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all tooltip"
                                 title="Download"
                               >
                                 <DownloadCloud size={18} />
-                              </a>
+                              </button>
                               <button 
-                                onClick={() => handleDeleteBackup(filename)}
+                                onClick={() => setBackupToDelete(filename)}
                                 className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-white dark:hover:bg-slate-800 rounded-xl transition-all"
                                 title="Delete"
                               >
@@ -754,6 +757,73 @@ export default function SettingsPage() {
           </div>
         )}
       </div>
+
+      {/* Backup Delete Modal */}
+      {backupToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="absolute inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm cursor-pointer" onClick={() => setBackupToDelete(null)} />
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-scale-up relative z-10">
+            <div className="p-6 text-center space-y-4">
+              <div className="w-16 h-16 bg-rose-100 dark:bg-rose-500/20 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                <Trash2 size={24} />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Delete Backup?</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">
+                Are you sure you want to delete <span className="font-mono text-xs">{backupToDelete}</span>? This action cannot be undone.
+              </p>
+              <div className="flex gap-3 pt-4">
+                <button 
+                  onClick={() => setBackupToDelete(null)}
+                  className="flex-1 py-2.5 text-slate-600 dark:text-slate-300 font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleDeleteBackup}
+                  className="flex-1 py-2.5 text-white font-bold bg-rose-600 hover:bg-rose-700 rounded-xl transition-all shadow-lg shadow-rose-200 dark:shadow-none"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Backup Download Modal */}
+      {backupToDownload && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="absolute inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm cursor-pointer" onClick={() => setBackupToDownload(null)} />
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-scale-up relative z-10">
+            <div className="p-6 text-center space-y-4">
+              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-500/20 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                <DownloadCloud size={24} />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Download Backup?</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">
+                You are about to download the database snapshot:<br/>
+                <span className="font-mono text-xs break-all text-slate-700 dark:text-slate-300 mt-1 inline-block bg-slate-50 dark:bg-slate-800 p-2 rounded-lg">{backupToDownload}</span>
+              </p>
+              <div className="flex gap-3 pt-4">
+                <button 
+                  onClick={() => setBackupToDownload(null)}
+                  className="flex-1 py-2.5 text-slate-600 dark:text-slate-300 font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-all"
+                >
+                  Cancel
+                </button>
+                <a 
+                  href={backupService.getDownloadUrl(backupToDownload)}
+                  download
+                  onClick={() => setTimeout(() => setBackupToDownload(null), 300)}
+                  className="flex-1 py-2.5 text-white font-bold bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shadow-lg shadow-blue-200 dark:shadow-none block"
+                >
+                  Download
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </AuthenticatedLayout>
   );
 }
