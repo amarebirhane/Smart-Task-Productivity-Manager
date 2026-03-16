@@ -51,7 +51,8 @@ def export_audit_logs_pdf(
     pdf.set_font("helvetica", "B", 16)
     pdf.cell(0, 10, "Audit Logs Report", ln=True, align="C")
     pdf.set_font("helvetica", "", 10)
-    pdf.cell(0, 10, f"Generated at: {io.datetime.datetime.now().isoformat()}", ln=True, align="C")
+    import datetime
+    pdf.cell(0, 10, f"Generated at: {datetime.datetime.now().isoformat()}", ln=True, align="C")
     pdf.ln(10)
     
     # Table Header

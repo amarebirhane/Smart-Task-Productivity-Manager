@@ -7,7 +7,7 @@ import { userService } from "@/services/userService";
 import { User } from "@/types/user";
 import { useToasts } from "@/components/Toast";
 import Pagination from "@/components/Pagination";
-import { Trash2, UserCog, Mail, Shield, Loader2, Plus, X, User as UserIcon, Lock, Save, Eye, Power, AlertTriangle } from "lucide-react";
+import { Trash2, UserCog, Mail, Shield, Loader2, Plus, X, User as UserIcon, Lock, Save, Eye, Power, AlertTriangle, DownloadCloud } from "lucide-react";
 import { TableSkeleton } from "@/components/Skeletons";
 
 export default function UsersPage() {
@@ -148,12 +148,20 @@ export default function UsersPage() {
             <h1 className="text-2xl font-bold text-slate-900 font-premium">System Users</h1>
             <p className="text-sm text-slate-500">Manage platform users and roles</p>
           </div>
-          <button 
-            onClick={openCreateModal}
-            className="btn-primary flex items-center gap-2 shadow-lg shadow-primary-200"
-          >
-            <Plus size={18} /> Add User
-          </button>
+          <div className="flex gap-3">
+            <button 
+              onClick={() => userService.exportUsersCSV()}
+              className="btn-primary-outline flex items-center gap-2"
+            >
+              <DownloadCloud size={18} /> Export CSV
+            </button>
+            <button 
+              onClick={openCreateModal}
+              className="btn-primary flex items-center gap-2 shadow-lg shadow-primary-200"
+            >
+              <Plus size={18} /> Add User
+            </button>
+          </div>
         </div>
 
         {loading ? (
