@@ -3,31 +3,13 @@
 import React, { useState, useEffect } from "react";
 import AuthenticatedLayout from "@/components/AuthenticatedLayout";
 import { useAuth } from "@/context/AuthContext";
-import api from "@/services/api";
-import { authService } from "@/features/auth/authService";
-import { useToasts } from "@/components/Toast";
+import Link from "next/link";
+import { userService } from "@/services/userService";
+import { notificationService, Notification } from "@/services/notificationService";
+import { TableSkeleton } from "@/components/Skeletons";
 import { 
-  Settings as SettingsIcon, 
-  Shield, 
-  Globe, 
-  Bell, 
-  User, 
-  Save, 
-  Loader2, 
-  AlertCircle,
-  X,
-  Lock,
-  CheckCircle2,
-  Sun,
-  Moon,
-  Monitor,
-  Palette,
-  Database,
-  DownloadCloud,
-  Trash2,
-  Plus,
-  RefreshCcw,
-  History
+  Settings as SettingsIcon, Shield, Globe, Bell, User, Save, Loader2, AlertCircle, X, Lock, CheckCircle2, Sun, Moon, Monitor, Palette, Database, DownloadCloud, Trash2, Plus, RefreshCcw, History, Info
+} from "lucide-react";
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { QRCodeSVG } from "qrcode.react";
@@ -55,6 +37,16 @@ export default function SettingsPage() {
   const [setupData, setSetupData] = useState<{ secret: string; provisioning_uri: string } | null>(null);
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [twoFactorCode, setTwoFactorCode] = useState("");
+  
+  // Notification States
+  const [history, setHistory] = useState<Notification[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [prefs, setPrefs] = useState({
+    email_notifications: user?.email_notifications ?? true,
+    push_notifications: user?.push_notifications ?? true,
+    task_updates: user?.task_updates ?? true,
+    system_alerts: user?.system_alerts ?? true
+  });
 
   // Password Edit States
   const [showPasswordEdit, setShowPasswordEdit] = useState(false);
@@ -491,11 +483,87 @@ export default function SettingsPage() {
               )}
 
               {activeTab === "notifications" && (
-                <div className="text-center py-20">
-                  <Bell className="mx-auto h-12 w-12 text-slate-300 mb-4" />
-                  <h3 className="font-bold text-slate-900">Stay Updated</h3>
-                  <p className="text-slate-500 text-sm max-w-xs mx-auto mt-2">Personalize how and when you receive alerts from the platform.</p>
-                  <button className="mt-6 btn-primary px-8">Enable Notifications</button>
+                <div className="space-y-10 animate-fade-in">
+                  <div>
+                    <h3 className="font-bold text-slate-900 dark:text-slate-100">Notification Preferences</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Choose how you want to be alerted</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                      { id: 'email_notifications', label: 'Email Alerts', icon: Mail, desc: 'Get updates in your inbox' },
+                      { id: 'push_notifications', label: 'Browser Notifications', icon: Bell, desc: 'Real-time desktop alerts' },
+                      { id: 'task_updates', label: 'Task Activity', icon: CheckCircle2, desc: 'When tasks are assigned/updated' },
+                      { id: 'system_alerts', label: 'System Announcements', icon: Info, desc: 'Critical platform updates' },
+                    ].map((pref) => (
+                      <div key={pref.id} className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400">
+                            <pref.icon size={20} />
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{pref.label}</p>
+                            <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{pref.desc}</p>
+                          </div>
+                        </div>
+                        <button 
+                          onClick={() => setPrefs(prev => ({ ...prev, [pref.id]: !prev[pref.id as keyof typeof prev] }))}
+                          className={`w-12 h-6 rounded-full transition-all relative ${prefs[pref.id as keyof typeof prefs] ? 'bg-primary-600' : 'bg-slate-300 dark:bg-slate-700'}`}
+                        >
+                          <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${prefs[pref.id as keyof typeof prefs] ? 'right-1' : 'left-1'}`}></div>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex justify-end pt-2">
+                    <button 
+                      onClick={handleUpdatePrefs}
+                      disabled={saving}
+                      className="btn-primary px-8 py-2.5 flex items-center gap-2"
+                    >
+                      {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                      Save Preferences
+                    </button>
+                  </div>
+
+                  <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex justify-between items-center mb-6">
+                      <div>
+                        <h3 className="font-bold text-slate-900 dark:text-slate-100">Recent Activity</h3>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">Your latest platform notifications</p>
+                      </div>
+                      <button onClick={fetchHistory} className="p-2 text-slate-400 hover:text-primary-600 transition-colors">
+                        <RefreshCcw size={18} className={loadingHistory ? 'animate-spin' : ''} />
+                      </button>
+                    </div>
+
+                    {loadingHistory ? (
+                      <TableSkeleton rows={3} />
+                    ) : history.length > 0 ? (
+                      <div className="space-y-3">
+                        {history.slice(0, 5).map(notification => (
+                          <div key={notification.id} className={`p-4 rounded-2xl border transition-all flex items-start gap-4 ${notification.is_read ? 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 opacity-60' : 'bg-primary-50/30 dark:bg-primary-900/10 border-primary-100 dark:border-primary-800'}`}>
+                            <div className={`mt-1 h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 ${notification.is_read ? 'bg-slate-100 text-slate-400' : 'bg-primary-100 text-primary-600'}`}>
+                              <Bell size={14} />
+                            </div>
+                            <div className="flex-1">
+                              <p className={`text-sm ${notification.is_read ? 'text-slate-600 dark:text-slate-400' : 'text-slate-900 dark:text-slate-100 font-medium'}`}>
+                                {notification.message}
+                              </p>
+                              <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 uppercase font-bold tracking-wider">
+                                {format(new Date(notification.created_at), 'PPPp')}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">No recent notifications</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

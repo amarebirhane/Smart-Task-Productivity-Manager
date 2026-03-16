@@ -69,6 +69,12 @@ class UserUpdateMe(BaseModel):
     first_name: Optional[str] = Field(None, description="The user's updated first name")
     last_name: Optional[str] = Field(None, description="The user's updated last name")
     email: Optional[EmailStr] = Field(None, description="The user's updated email address")
+    
+    # Notification preferences
+    email_notifications: Optional[bool] = Field(None, description="Toggle email notifications")
+    push_notifications: Optional[bool] = Field(None, description="Toggle push notifications")
+    task_updates: Optional[bool] = Field(None, description="Toggle task update alerts")
+    system_alerts: Optional[bool] = Field(None, description="Toggle system wide alerts")
 
 class PasswordChange(BaseModel):
     old_password: str = Field(..., description="The user's current password")
